@@ -1,0 +1,107 @@
+﻿<UserControl x:Class="WpfDebugger.ProcedureListControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:my="clr-namespace:WpfDebugger"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" Focusable="True">
+    <Grid>
+
+        <!--
+        VirtualizingPanel.IsContainerVirtualizable="True"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling"
+        
+        VirtualizingStackPanel-->
+        <ListView Name="lvProcedures"
+                  ItemsSource="{Binding Items}"
+                  FontFamily="Consolas"
+                  SelectionMode="Single"
+                  VirtualizingStackPanel.IsVirtualizing="True"
+                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+                  PreviewKeyDown="ListView_PreviewKeyDown">
+
+            <ListView.CommandBindings>
+                <CommandBinding Command="my:DebuggerCommands.OpenDisassembly"
+                                CanExecute="OpenLinkCommand_CanExecute"
+                                Executed="OpenDisassemblyCommand_Executed"/>
+                <CommandBinding Command="my:DebuggerCommands.OpenNewDisassembly"
+                                CanExecute="OpenLinkCommand_CanExecute"
+                                Executed="OpenNewDisassemblyCommand_Executed"/>
+                <CommandBinding Command="my:DebuggerCommands.OpenHexView"
+                                CanExecute="OpenLinkCommand_CanExecute"
+                                Executed="OpenHexViewCommand_Executed"/>
+                <CommandBinding Command="my:DebuggerCommands.OpenNewHexView"
+                                CanExecute="OpenLinkCommand_CanExecute"
+                                Executed="OpenNewHexViewCommand_Executed"/>
+            </ListView.CommandBindings>
+            
+            <ListView.Resources>
+                <ContextMenu x:Key="contextMenu">
+                    <!-- The DataContext of the menu item is automatically
+                         set to the underlying ProcedureListItem. Nice! -->
+                    <MenuItem Header="Open _Disassembly"
+                              Command="my:DebuggerCommands.OpenDisassembly"
+                              CommandParameter="{Binding Uri}"/>
+                    <MenuItem Header="Open Disassembly in _New Tab"
+                              InputGestureText="Ctrl"
+                              Command="my:DebuggerCommands.OpenNewDisassembly"
+                              CommandParameter="{Binding Uri}"/>
+                    <Separator/>
+                    <MenuItem Header="Open _Hex View"
+                              InputGestureText="Shift"
+                              Command="my:DebuggerCommands.OpenHexView"
+                              CommandParameter="{Binding Uri}"/>
+                    <MenuItem Header="Open Hex View in New _Tab"
+                              InputGestureText="Ctrl+Shift"
+                              Command="my:DebuggerCommands.OpenNewHexView"
+                              CommandParameter="{Binding Uri}"/>
+                </ContextMenu>
+            </ListView.Resources>
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
+                    <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
+                    <Setter Property="ContextMenu" Value="{StaticResource contextMenu}"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+            
+            <ListView.View>
+                <GridView>
+                    
+                    <GridViewColumn Header="Entry Point" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock TextTrimming="CharacterEllipsis"><Hyperlink
+                                    Style="{StaticResource HoverHyperlinkStyle}"
+                                    NavigateUri="{Binding Uri}"
+                                    Click="Hyperlink_Click"><Run Text="{Binding Path=EntryPointString,Mode=OneWay}"/></Hyperlink></TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Name" Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Size" Width="60">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock TextTrimming="CharacterEllipsis"
+                                           TextAlignment="Right"
+                                           Text="{Binding Size}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                </GridView>
+            </ListView.View>
+        </ListView>
+        
+    </Grid>
+</UserControl>

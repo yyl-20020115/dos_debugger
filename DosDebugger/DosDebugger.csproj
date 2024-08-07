@@ -1,0 +1,256 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{53F38FFD-B2CD-4477-BDE1-CE62A17B7CC3}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DosDebugger</RootNamespace>
+    <AssemblyName>DosDebugger</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WeifenLuo.WinFormsUI.Docking">
+      <HintPath>..\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CallGraphWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CallGraphWindow.Designer.cs">
+      <DependentUpon>CallGraphWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataGridViewLinkLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Document.cs" />
+    <Compile Include="ErrorWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ErrorWindow.Designer.cs">
+      <DependentUpon>ErrorWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HexWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HexWindow.Designer.cs">
+      <DependentUpon>HexWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HtmlRenderer.cs" />
+    <Compile Include="LibraryBrowserWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LibraryBrowserWindow.Designer.cs">
+      <DependentUpon>LibraryBrowserWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ListingViewModel.cs" />
+    <Compile Include="ListingWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ListingWindow.Designer.cs">
+      <DependentUpon>ListingWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NavigationHistory.cs" />
+    <Compile Include="ProcedureWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProcedureWindow.Designer.cs">
+      <DependentUpon>ProcedureWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="PropertiesWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PropertiesWindow.designer.cs">
+      <DependentUpon>PropertiesWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SegmentWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SegmentWindow.Designer.cs">
+      <DependentUpon>SegmentWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GraphicsExtensions.cs" />
+    <Compile Include="ToolStripExtensions.cs" />
+    <Compile Include="ToolWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ToolWindow.Designer.cs">
+      <DependentUpon>ToolWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModel.cs" />
+    <EmbeddedResource Include="CallGraphWindow.resx">
+      <DependentUpon>CallGraphWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ErrorWindow.resx">
+      <DependentUpon>ErrorWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HexWindow.resx">
+      <DependentUpon>HexWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LibraryBrowserWindow.resx">
+      <DependentUpon>LibraryBrowserWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ListingWindow.resx">
+      <DependentUpon>ListingWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProcedureWindow.resx">
+      <DependentUpon>ProcedureWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PropertiesWindow.resx">
+      <DependentUpon>PropertiesWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="SegmentWindow.resx">
+      <DependentUpon>SegmentWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ToolWindow.resx">
+      <DependentUpon>ToolWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\left_circular-26.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Disassembler\Disassembler.csproj">
+      <Project>{fe4abc64-1873-4e7d-b930-d50d2e948e1e}</Project>
+      <Name>Disassembler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Util\Util-v2.0.csproj">
+      <Project>{70014904-13e0-4afa-a6dd-0ec93100c3c7}</Project>
+      <Name>Util-v2.0</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\X86Codec\X86Codec.csproj">
+      <Project>{bd1b05d2-429d-4080-bddf-981c0f78a192}</Project>
+      <Name>X86Codec</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\right_circular-26.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\error-26.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\settings2-26.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\activity_feed-26.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cancel-26.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\about-26.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\logout-26.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\login-26.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

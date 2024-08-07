@@ -1,0 +1,82 @@
+﻿<UserControl x:Class="WpfDebugger.ErrorListControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+             Focusable="True">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ToolBar ToolBarTray.IsLocked="True" Loaded="ToolBar_Loaded"
+                 KeyboardNavigation.TabNavigation="Continue">
+            <ToggleButton ToolBar.OverflowMode="Never" 
+                          IsChecked="{Binding ShowErrors}"
+                          IsEnabled="{Binding HasErrors}">
+                <StackPanel Orientation="Horizontal">
+                    <!--<util:AutoGrayImage Source="{StaticResource ResourceKey=ErrorImage}"
+                           Style="{StaticResource StandardIcon}"/>-->
+                    <TextBlock x:Name="txtError" Margin="4,0,0,0" Text="{Binding ErrorCount, StringFormat='\{0\} Errors'}" />
+                </StackPanel>
+            </ToggleButton>
+            <Separator ToolBar.OverflowMode="Never"/>
+            <ToggleButton ToolBar.OverflowMode="Never" 
+                          IsChecked="{Binding ShowWarnings}"
+                          IsEnabled="{Binding HasWarnings}">
+                <StackPanel Orientation="Horizontal">
+                    <!--<util:AutoGrayImage Source="{StaticResource ResourceKey=WarningImage}"
+                           Style="{StaticResource StandardIcon}"/>-->
+                    <TextBlock Margin="4,0,0,0" Text="{Binding WarningCount, StringFormat='\{0\} Warnings'}" />
+                </StackPanel>
+            </ToggleButton>
+            <Separator ToolBar.OverflowMode="Never"/>
+            <ToggleButton ToolBar.OverflowMode="Never" 
+                          IsChecked="{Binding ShowMessages}"
+                          IsEnabled="{Binding HasMessages}">
+                <StackPanel Orientation="Horizontal">
+                    <!--<util:AutoGrayImage Source="{StaticResource ResourceKey=MessageImage}"
+                           Style="{StaticResource StandardIcon}"/>-->
+                    <TextBlock Margin="4,0,0,0" Text="{Binding MessageCount, StringFormat='\{0\} Messages'}" />
+                </StackPanel>
+            </ToggleButton>
+        </ToolBar>
+
+        <!--
+                          VirtualizingPanel.IsContainerVirtualizable="True"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling"
+        -->
+        <ListView Name="lvErrors" Grid.Row="1"
+                  ItemsSource="{Binding Items}"
+                  FontFamily="Consolas" 
+                  SelectionMode="Single"
+                  
+                  VirtualizingStackPanel.IsVirtualizing="True"
+                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+                  SelectionChanged="lvErrors_SelectionChanged">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Location" Width="100"
+                                    >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=LocationString}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Message" Width="500"
+                                    >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Message}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</UserControl>
