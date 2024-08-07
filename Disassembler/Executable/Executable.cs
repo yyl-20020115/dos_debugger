@@ -17,7 +17,7 @@ public class Executable : Assembly
 
     public override BinaryImage GetImage() => Image;
 
-    private static Address PointerToAddress(FarPointer pointer) => new(pointer.Segment, pointer.Offset);
+    public static Address PointerToAddress(FarPointer pointer) => new(pointer.Segment, pointer.Offset);
 
     /// <summary>
     /// Gets the entry point address of the executable.

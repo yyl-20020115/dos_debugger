@@ -13,16 +13,14 @@ public class LibraryImage : BinaryImage
         if (!IsAddressValid(address))
             throw new ArgumentOutOfRangeException("address");
 
-        LibrarySegment seg = GetSegment(address.Segment);
+        var seg = GetSegment(address.Segment);
         return new ArraySegment<byte>(seg.Data, address.Offset, count);
     }
-    
+
     public override string FormatAddress(Address address)
-    {
-        return address.Segment < 0 || address.Segment >= Segments.Count
-            ? throw new ArgumentOutOfRangeException("address")
+        => address.Segment < 0 || address.Segment >= Segments.Count
+            ? throw new ArgumentOutOfRangeException(nameof(address))
             : $"{Segments[address.Segment].Name}+{address.Offset:X4}";
-    }
 }
 
 public class LibrarySegment(LogicalSegment segment) : Segment

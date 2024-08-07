@@ -82,9 +82,9 @@ public static class HtmlConverter
                 break;
             }
             
-            string tagString = html.Substring(k1 + 1, k2 - k1 - 1);
-            HtmlElement tag = HtmlElement.Parse(tagString);
-            string tagName = (tag != null) ? tag.Name.ToLowerInvariant() : null;
+            var tagString = html.Substring(k1 + 1, k2 - k1 - 1);
+            var tag = HtmlElement.Parse(tagString);
+            var tagName = (tag != null) ? tag.Name.ToLowerInvariant() : null;
 
             if (tagName == null) // parse failed; output as is
             {
@@ -117,7 +117,7 @@ public static class HtmlConverter
                         break;
                     case "a":
                         {
-                            Hyperlink hyperlink = new Hyperlink();
+                            var hyperlink = new Hyperlink();
                             if (tag.Attributes != null)
                             {
                                 foreach (HtmlAttribute attr in tag.Attributes)

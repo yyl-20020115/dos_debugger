@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-//using Util.Data;
 
 namespace Disassembler;
 
@@ -67,7 +66,7 @@ public class Procedure(Address entryPoint)
         get
         {
             int size = 0;
-            foreach (BasicBlock block in BasicBlocks)
+            foreach (var block in BasicBlocks)
             {
                 size += block.Length;
             }
@@ -179,7 +178,7 @@ public class ProcedureCollection : ICollection<Procedure>
 
     public ProcedureCollection()
     {
-        this.CallGraph = new CallGraph(this);
+        this.CallGraph = new (this);
     }
 
     /// <summary>

@@ -29,7 +29,7 @@ public partial class ErrorListControl : UserControl
 
     private void ToolBar_Loaded(object sender, RoutedEventArgs e)
     {
-        ToolBar toolBar = sender as ToolBar;
+        var toolBar = sender as ToolBar;
         if (toolBar.Template.FindName("OverflowGrid", toolBar) is FrameworkElement overflowGrid)
         {
             overflowGrid.Visibility = Visibility.Hidden;
@@ -43,9 +43,9 @@ public partial class ErrorListControl : UserControl
 
         if (RequestNavigate != null)
         {
-            Error error = item.Error;
-            AssemblyUri uri = new AssemblyUri(program, error.Location);
-            RequestNavigateEventArgs args = new RequestNavigateEventArgs(uri, null);
+            var error = item.Error;
+            var uri = new AssemblyUri(program, error.Location);
+            var args = new RequestNavigateEventArgs(uri, null);
             RequestNavigate(this, args);
         }
     }
@@ -138,7 +138,7 @@ class ErrorListViewModel : INotifyPropertyChanged
         int n = program.GetImage().Errors.Count;
         allItems = (from error in program.GetImage().Errors
                     select new ErrorListItem(error, program)).ToArray();
-        foreach (ErrorListItem item in allItems)
+        foreach (var item in allItems)
         {
             switch (item.Error.Category)
             {

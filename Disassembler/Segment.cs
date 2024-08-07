@@ -85,36 +85,21 @@ public class SegmentCollection : IList<Segment>
 {
     readonly List<Segment> segments = [];
 
-    public T Get<T>(int index) where T : Segment
-    {
-        return (T)segments[index];
-    }
+    public T Get<T>(int index) where T : Segment => (T)segments[index];
 
     public Segment this[int index]
     {
-        get { return segments[index]; }
-        set { throw new NotSupportedException(); }
+        get => segments[index];
+        set => throw new NotSupportedException();
     }
 
-    public bool Contains(Segment item)
-    {
-        return segments.Contains(item);
-    }
+    public bool Contains(Segment item) => segments.Contains(item);
 
-    public void CopyTo(Segment[] array, int arrayIndex)
-    {
-        segments.CopyTo(array, arrayIndex);
-    }
+    public void CopyTo(Segment[] array, int arrayIndex) => segments.CopyTo(array, arrayIndex);
 
-    public int Count
-    {
-        get { return segments.Count; }
-    }
+    public int Count => segments.Count;
 
-    public int IndexOf(Segment item)
-    {
-        return segments.IndexOf(item);
-    }
+    public int IndexOf(Segment item) => segments.IndexOf(item);
 
     public void Add(Segment segment)
     {
@@ -126,38 +111,17 @@ public class SegmentCollection : IList<Segment>
         segments.Add(segment);
     }
 
-    public bool IsReadOnly
-    {
-        get { return false; }
-    }
+    public bool IsReadOnly => false;
 
-    void ICollection<Segment>.Clear()
-    {
-        throw new NotSupportedException();
-    }
+    void ICollection<Segment>.Clear() => throw new NotSupportedException();
 
-    void IList<Segment>.Insert(int index, Segment item)
-    {
-        throw new NotSupportedException();
-    }
+    void IList<Segment>.Insert(int index, Segment item) => throw new NotSupportedException();
 
-    void IList<Segment>.RemoveAt(int index)
-    {
-        throw new NotSupportedException();
-    }
+    void IList<Segment>.RemoveAt(int index) => throw new NotSupportedException();
 
-    public bool Remove(Segment item)
-    {
-        throw new NotSupportedException();
-    }
+    public bool Remove(Segment item) => throw new NotSupportedException();
 
-    public IEnumerator<Segment> GetEnumerator()
-    {
-        return segments.GetEnumerator();
-    }
+    public IEnumerator<Segment> GetEnumerator() => segments.GetEnumerator();
 
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 }

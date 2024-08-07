@@ -169,24 +169,24 @@ public class MemoryModelComment : Comment
 
     public override string ToString()
     {
-        var sb = new StringBuilder();
+        var builder = new StringBuilder();
         if (InstructionSet != 0)
         {
-            sb.Append(InstructionSet);
+            builder.Append(InstructionSet);
         }
         if (MemoryModel != Disassembler.MemoryModel.Unknown)
         {
-            if (sb.Length > 0)
-                sb.Append(',');
-            sb.Append(MemoryModel.ToString());
+            if (builder.Length > 0)
+                builder.Append(',');
+            builder.Append(MemoryModel.ToString());
         }
         if (Optimized)
         {
-            if (sb.Length > 0)
-                sb.Append(',');
-            sb.Append("Optimized");
+            if (builder.Length > 0)
+                builder.Append(',');
+            builder.Append("Optimized");
         }
-        return sb.ToString();
+        return builder.ToString();
     }
 }
 
@@ -248,10 +248,7 @@ class LIBMODComment : Comment
         context.ObjectName = ModuleName;
     }
 
-    public override string ToString()
-    {
-        return "ModuleName=" + ModuleName;
-    }
+    public override string ToString() => "ModuleName=" + ModuleName;
 }
 
 public class WKEXTComment : Comment
@@ -278,10 +275,5 @@ public struct WeakExternalDefinition
     public UInt16 WeakExternalIndex { get; internal set; }
     public UInt16 DefaultResolutionIndex { get; internal set; }
 
-    public override string ToString()
-    {
-        return string.Format("{0} => {1}",
-            WeakExternalIndex,
-            DefaultResolutionIndex);
-    }
+    public override readonly string ToString() => $"{WeakExternalIndex} => {DefaultResolutionIndex}";
 }

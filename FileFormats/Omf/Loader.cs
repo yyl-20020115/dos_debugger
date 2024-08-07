@@ -19,7 +19,7 @@ public static class OmfLoader
 
         using Stream stream = File.OpenRead(fileName);
         using BinaryReader reader = new(stream);
-        List<Records.RecordContext> modules =
+        List<RecordContext> modules =
             new(LoadLibrary(reader));
         return modules;
     }
@@ -34,13 +34,13 @@ public static class OmfLoader
         if (reader == null)
             throw new ArgumentNullException(nameof(reader));
 
-        LibraryHeaderRecord r = (LibraryHeaderRecord)
+        var r = (LibraryHeaderRecord)
             Record.ReadRecord(reader, null, RecordNumber.LibraryHeader);
         int pageSize = r.PageSize;
 
         while (true)
         {
-            Records.RecordContext module = LoadObject(reader);
+            var module = LoadObject(reader);
             if (module == null) // LibraryEndRecord encountered
             {
                 yield break;
@@ -73,7 +73,7 @@ public static class OmfLoader
 
         while (true)
         {
-            Record record = Record.ReadRecord(reader, context);
+            var record = Record.ReadRecord(reader, context);
             records.Add(record);
 
             if (record.RecordNumber == RecordNumber.MODEND ||

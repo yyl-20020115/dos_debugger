@@ -16,9 +16,9 @@ public class LibraryDisassembler(ObjectLibrary library) : DisassemblerBase(libra
     protected override void GenerateProcedures()
     {
         // Enumerate the defined names, and assign names to the procedures.
-        foreach (ObjectModule module in library.Modules.Cast<ObjectModule>())
+        foreach (var module in library.Modules.Cast<ObjectModule>())
         {
-            foreach (DefinedSymbol symbol in module.DefinedNames)
+            foreach (var symbol in module.DefinedNames)
             {
                 if (symbol.BaseSegment != null)
                 {
@@ -51,7 +51,7 @@ public class LibraryDisassembler(ObjectLibrary library) : DisassemblerBase(libra
         // Find the first fixup that covers the instruction. If no
         // fix-up covers the instruction, find the closest fix-up
         // that comes after.
-        FixupCollection fixups = library.Image.GetSegment(address.Segment).Segment.Fixups;
+        var fixups = library.Image.GetSegment(address.Segment).Segment.Fixups;
         int fixupIndex = fixups.BinarySearch(address.Offset);
 
         // If there's a fixup right at the beginning of the instruction,
@@ -77,11 +77,11 @@ public class LibraryDisassembler(ObjectLibrary library) : DisassemblerBase(libra
             if (fixupIndex >= fixups.Count) // no more fixups
                 break;
 
-            Fixup fixup = fixups[fixupIndex];
+            var fixup = fixups[fixupIndex];
             if (fixup.StartIndex >= address.Offset + instruction.EncodedLength) // past end
                 break;
 
-            Operand operand = instruction.Operands[i];
+            var operand = instruction.Operands[i];
             if (operand.FixableLocation.Length > 0)
             {
                 int start = address.Offset + operand.FixableLocation.StartOffset;
@@ -114,7 +114,7 @@ public class LibraryDisassembler(ObjectLibrary library) : DisassemblerBase(libra
 
         if (fixupIndex < fixups.Count)
         {
-            Fixup fixup = fixups[fixupIndex];
+            var fixup = fixups[fixupIndex];
             if (fixup.StartIndex < address.Offset + instruction.EncodedLength)
             {
                 if (IsFloatingPointEmulatorFixup(fixup))
@@ -142,26 +142,26 @@ public class LibraryDisassembler(ObjectLibrary library) : DisassemblerBase(libra
 
     private Address ResolveSymbolicTarget(SymbolicTarget symbolicTarget)
     {
-        Address referentAddress = symbolicTarget.Referent.Resolve();
+        var referentAddress = symbolicTarget.Referent.Resolve();
         if (referentAddress == Address.Invalid)
         {
             //AddError(start, ErrorCode.UnresolvedTarget,
             //    "Cannot resolve target: {0}.", symbolicTarget);
             return Address.Invalid;
         }
-        Address symbolicAddress = referentAddress + (int)symbolicTarget.Displacement;
+        var symbolicAddress = referentAddress + (int)symbolicTarget.Displacement;
         return symbolicAddress;
     }
 
     protected override Address ResolveFlowInstructionTarget(RelativeOperand operand)
     {
-        SymbolicTarget symbolicTarget = operand.Tag as SymbolicTarget;
+        var symbolicTarget = operand.Tag as SymbolicTarget;
         if (symbolicTarget != null)
         {
-            Address symbolicAddress = ResolveSymbolicTarget(symbolicTarget);
+            var symbolicAddress = ResolveSymbolicTarget(symbolicTarget);
             if (symbolicAddress != Address.Invalid)
             {
-                Address target = symbolicAddress + operand.Offset.Value;
+                var target = symbolicAddress + operand.Offset.Value;
                 return new Address(target.Segment, (UInt16)target.Offset);
             }
             return Address.Invalid;
@@ -173,7 +173,7 @@ public class LibraryDisassembler(ObjectLibrary library) : DisassemblerBase(libra
     {
         if (operand.Tag is SymbolicTarget symbolicTarget)
         {
-            Address symbolicAddress = ResolveSymbolicTarget(symbolicTarget);
+            var symbolicAddress = ResolveSymbolicTarget(symbolicTarget);
             return symbolicAddress;
         }
         return base.ResolveFlowInstructionTarget(operand);
@@ -181,9 +181,9 @@ public class LibraryDisassembler(ObjectLibrary library) : DisassemblerBase(libra
 
     public override void Analyze()
     {
-        foreach (ObjectModule module in library.Modules.Cast<ObjectModule>())
+        foreach (var module in library.Modules.Cast<ObjectModule>())
         {
-            foreach (DefinedSymbol symbol in module.DefinedNames)
+            foreach (var symbol in module.DefinedNames)
             {
                 if (symbol.BaseSegment == null)
                     continue;
@@ -199,7 +199,7 @@ public class LibraryDisassembler(ObjectLibrary library) : DisassemblerBase(libra
                     continue;
                 }
 
-                Address entryPoint = new Address(
+                var entryPoint = new Address(
                     symbol.BaseSegment.Id, (int)symbol.Offset);
                 GenerateBasicBlocks(entryPoint, XRefType.UserSpecified);
             }

@@ -114,8 +114,8 @@ public abstract class BinaryImage
     /// <returns></returns>
     public ByteAttribute this[Address address]
     {
-        get { return attributes.GetAt(address); }
-        private set { attributes.SetAt(address, value); }
+        get => attributes.GetAt(address);
+        private set => attributes.SetAt(address, value);
     }
 
     #region Properties
@@ -151,7 +151,7 @@ public abstract class BinaryImage
         if (startAddress.Segment != endAddress.Segment)
             throw new ArgumentException("startAddress and endAddress must be on the same segment.");
 
-        for (Address p = startAddress; p != endAddress; p = p + 1)
+        for (var p = startAddress; p != endAddress; p = p + 1)
         {
             if (this[p].Type != type)
                 return false;
@@ -169,7 +169,7 @@ public abstract class BinaryImage
         if (startAddress.Segment != endAddress.Segment)
             throw new ArgumentException("startAddress and endAddress must be on the same segment.");
 
-        ArraySegment<ByteAttribute> attrs = attributes.GetAttributes(
+        var attrs = attributes.GetAttributes(
             startAddress, endAddress.Offset - startAddress.Offset);
 
         for (int i = 0; i < attrs.Count; i++)
@@ -184,7 +184,7 @@ public abstract class BinaryImage
                 throw new ArgumentException("[start, end) overlaps with analyzed bytes.");
             }
 
-            ByteAttribute attr = new ByteAttribute {
+            var attr = new ByteAttribute {
                 Type = type,
                 IsLeadByte = (i == 0),
             };

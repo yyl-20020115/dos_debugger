@@ -71,12 +71,12 @@ public class CallGraph(ProcedureCollection procedures)
     /// </returns>
     public IEnumerable<Procedure> GetCallers(Procedure procedure)
     {
-        Address last = Address.Invalid;
-        foreach (XRef xCall in graph.GetReferencesTo(procedure.EntryPoint))
+        var last = Address.Invalid;
+        foreach (var xCall in graph.GetReferencesTo(procedure.EntryPoint))
         {
             if (xCall.Source != last)
             {
-                Procedure caller = procedures.Find(xCall.Source);
+                var caller = procedures.Find(xCall.Source);
                 System.Diagnostics.Debug.Assert(caller != null);
                 yield return caller;
                 last = xCall.Source;
@@ -94,12 +94,12 @@ public class CallGraph(ProcedureCollection procedures)
     /// </returns>
     public IEnumerable<Procedure> GetCallees(Procedure procedure)
     {
-        Address last = Address.Invalid;
-        foreach (XRef xCall in graph.GetReferencesFrom(procedure.EntryPoint))
+        var last = Address.Invalid;
+        foreach (var xCall in graph.GetReferencesFrom(procedure.EntryPoint))
         {
             if (xCall.Target != last)
             {
-                Procedure callee = procedures.Find(xCall.Target);
+                var callee = procedures.Find(xCall.Target);
                 System.Diagnostics.Debug.Assert(callee != null);
                 yield return callee;
                 last = xCall.Target;

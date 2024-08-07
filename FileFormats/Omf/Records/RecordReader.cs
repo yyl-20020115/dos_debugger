@@ -48,7 +48,7 @@ public class RecordReader
 
     public string ReadToEndAsString()
     {
-        string s = Encoding.ASCII.GetString(Data, index, Data.Length - index);
+        var s = Encoding.ASCII.GetString(Data, index, Data.Length - index);
         index = Data.Length;
         return s;
     }
@@ -57,8 +57,8 @@ public class RecordReader
     {
         if (index + 2 > Data.Length)
             throw new InvalidDataException();
-        byte b1 = Data[index++];
-        byte b2 = Data[index++];
+        var b1 = Data[index++];
+        var b2 = Data[index++];
         return (UInt16)(b1 | (b2 << 8));
     }
 
@@ -66,9 +66,9 @@ public class RecordReader
     {
         if (index + 3 > Data.Length)
             throw new InvalidDataException();
-        byte b1 = Data[index++];
-        byte b2 = Data[index++];
-        byte b3 = Data[index++];
+        var b1 = Data[index++];
+        var b2 = Data[index++];
+        var b3 = Data[index++];
         return (UInt16)(b1 | (b2 << 8) | (b3 << 16));
     }
 
@@ -76,10 +76,10 @@ public class RecordReader
     {
         if (index + 4 > Data.Length)
             throw new InvalidDataException();
-        byte b1 = Data[index++];
-        byte b2 = Data[index++];
-        byte b3 = Data[index++];
-        byte b4 = Data[index++];
+        var b1 = Data[index++];
+        var b2 = Data[index++];
+        var b3 = Data[index++];
+        var b4 = Data[index++];
         return (UInt32)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24));
     }
 
@@ -99,14 +99,14 @@ public class RecordReader
         if (index >= Data.Length)
             throw new InvalidDataException();
 
-        byte len = Data[index++];
+        var len = Data[index++];
         if (len == 0)
-            return "";
+            return string.Empty;
 
         if (index + len > Data.Length)
             throw new InvalidDataException();
 
-        string s = Encoding.ASCII.GetString(Data, index, len);
+        var s = Encoding.ASCII.GetString(Data, index, len);
         index += len;
         return s;
     }
@@ -119,7 +119,7 @@ public class RecordReader
         if (index >= Data.Length)
             throw new InvalidDataException();
 
-        byte b1 = Data[index++];
+        var b1 = Data[index++];
         if ((b1 & 0x80) == 0)
         {
             return b1;
@@ -129,7 +129,7 @@ public class RecordReader
             if (index >= Data.Length)
                 throw new InvalidDataException();
 
-            byte b2 = Data[index++];
+            var b2 = Data[index++];
             return (UInt16)(((b1 & 0x7F) << 8) | b2);
         }
     }

@@ -45,7 +45,7 @@ public class ExecutableImage : BinaryImage
         List<int> relocs = [];
         foreach (var location in file.RelocatableLocations)
         {
-            int index = location.Segment * 16 + location.Offset;
+            var index = location.Segment * 16 + location.Offset;
             if (index >= 0 && index < bytes.Length - 1)
                 relocs.Add(index);
         }
@@ -61,9 +61,9 @@ public class ExecutableImage : BinaryImage
         // themselves also provide clue about the program's segmentation,
         // it is less important because they are not directly referenced
         // in the program. Therefore we ignore them for the moment.
-        foreach (int index in relocatableLocations)
+        foreach (var index in relocatableLocations)
         {
-            UInt16 frame = BitConverter.ToUInt16(bytes, index);
+            var frame = BitConverter.ToUInt16(bytes, index);
             mapFrameToSegment[frame] = -1;
         }
         mapFrameToSegment[file.EntryPoint.Segment] = -1;
@@ -74,17 +74,17 @@ public class ExecutableImage : BinaryImage
         // offset of each segment.
         for (int i = 0; i < mapFrameToSegment.Count; i++)
         {
-            UInt16 frameNumber = mapFrameToSegment.Keys[i];
+            var frameNumber = mapFrameToSegment.Keys[i];
             var segment = new ExecutableSegment(this, i, frameNumber);
 
             // Compute offset bounds for this segment.
             // The lower bound is off course zero.
             // The upper bound is 15 bytes into the next segment.
-            int startIndex = frameNumber * 16;
+            var startIndex = frameNumber * 16;
             if (startIndex < bytes.Length)
             {
-                int offsetLowerBound = 0;
-                int offsetUpperBound = Math.Min(bytes.Length - startIndex, 0x10000);
+                var offsetLowerBound = 0;
+                var offsetUpperBound = Math.Min(bytes.Length - startIndex, 0x10000);
                 if (i < mapFrameToSegment.Count - 1)
                 {
                     offsetUpperBound = Math.Min(
@@ -118,7 +118,7 @@ public class ExecutableImage : BinaryImage
 
     public bool IsAddressRelocatable(Address address)
     {
-        int index = ToLinearAddress(address);
+        var index = ToLinearAddress(address);
         return Array.BinarySearch(relocatableLocations, index) >= 0;
     }
 
@@ -165,7 +165,7 @@ public class ExecutableImage : BinaryImage
         if (segmentIndex > 0)
         {
             var segBefore = GetSegment(segmentIndex - 1);
-            int numBytesOverlap = 
+            var numBytesOverlap = 
                 (segBefore.Frame * 16 + segBefore.OffsetBounds.End) -
                 (segment.Frame * 16 + segment.OffsetCoverage.Begin);
             if (numBytesOverlap > 0)
@@ -178,7 +178,7 @@ public class ExecutableImage : BinaryImage
         if (segmentIndex < base.Segments.Count - 1)
         {
             var segAfter = GetSegment(segmentIndex + 1);
-            int numBytesOverlap =
+            var numBytesOverlap =
                 (segment.Frame * 16 + segment.OffsetCoverage.End) -
                 (segAfter.Frame * 16 + segAfter.OffsetBounds.Begin);
             if (numBytesOverlap > 0)
@@ -202,7 +202,7 @@ public class ExecutableImage : BinaryImage
         if (!IsAddressValid(address))
             throw new ArgumentOutOfRangeException("address");
 
-        int index = ToLinearAddress(address);
+        var index = ToLinearAddress(address);
         return new ArraySegment<byte>(bytes, index, count);
     }
 }

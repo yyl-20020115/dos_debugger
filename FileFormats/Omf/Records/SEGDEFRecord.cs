@@ -10,13 +10,15 @@ public class SEGDEFRecord : Record
     public SEGDEFRecord(RecordReader reader, RecordContext context)
         : base(reader, context)
     {
-        SegmentDefinition def = new();
 
         // Read the record.
-        byte acbp = reader.ReadByte();
-        def.Alignment = GetAlignment(acbp);
-        def.Combination = GetCombination(acbp);
-        def.IsUse32 = GetUse32(acbp);
+        var acbp = reader.ReadByte();
+        SegmentDefinition def = new()
+        {
+            Alignment = GetAlignment(acbp),
+            Combination = GetCombination(acbp),
+            IsUse32 = GetUse32(acbp)
+        };
 
         if (def.Alignment == SegmentAlignment.Absolute)
         {

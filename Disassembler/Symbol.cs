@@ -47,10 +47,7 @@ public enum SymbolScope : byte
 /// </summary>
 public class ExternalSymbol : Symbol, IAddressReferent
 {
-    public ExternalSymbol()
-    {
-        this.ResolvedAddress = Address.Invalid;
-    }
+    public ExternalSymbol() => this.ResolvedAddress = Address.Invalid;
 
     public Address ResolvedAddress { get; set; }
 
@@ -119,8 +116,8 @@ public class SymbolAlias : Symbol
     [Browsable(true)]
     public string AliasName
     {
-        get { return Name; }
-        internal set { Name = value; }
+        get => Name;
+        internal set => Name = value;
     }
 
     [Browsable(true)]

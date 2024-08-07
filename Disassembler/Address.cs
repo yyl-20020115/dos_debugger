@@ -251,26 +251,24 @@ public struct Address(int segment, int offset) : IComparable<Address>
     public readonly int CompareTo(Address other)
     {
         var cmp = this.Segment.CompareTo(other.Segment);
-        if (cmp == 0)
-            cmp = this.Offset.CompareTo(other.Offset);
-        return cmp;
+        return cmp != 0 ? cmp : this.Offset.CompareTo(other.Offset);
     }
 
     /// <summary>
     /// Increments the offset by the given amount. The resulting offset
     /// may be negative or greater than 0xFFFF.
     /// </summary>
-    public static Address operator +(Address address, int increment) 
-        => new (address.Segment, address.Offset + increment);
+    public static Address operator +(Address address, int increment)
+        => new(address.Segment, address.Offset + increment);
 
     /// <summary>
     /// Decrements the offset by the given amount. The resulting offset
     /// may be negative or greater than 0xFFFF.
     /// </summary>
     public static Address operator -(Address address, int decrement)
-        => new (address.Segment, address.Offset - decrement);
+        => new(address.Segment, address.Offset - decrement);
 
-    public override readonly string ToString() 
+    public override readonly string ToString()
         => this == Invalid ? "(Invalid)" : $"seg{Segment:0000}:{Offset:X4}";
 }
 

@@ -53,7 +53,7 @@ public class BasicBlock
 
     public BasicBlockType Type => type;
 
-    public AddressRange Bounds => new AddressRange(location, location + length);
+    public AddressRange Bounds => new (location, location + length);
 
     public override string ToString() => $"{Bounds} ({Type})";
 
@@ -61,9 +61,9 @@ public class BasicBlock
 
     public IEnumerable<Instruction> GetInstructions(BinaryImage image)
     {
-        for (Address p = this.location; p != this.location + length; )
+        for (var p = this.location; p != this.location + length; )
         {
-            Instruction instruction = image.Instructions.Find(p);
+            var instruction = image.Instructions.Find(p);
             yield return instruction;
             p += instruction.EncodedLength;
         }
@@ -194,11 +194,8 @@ public class BasicBlockCollection : ICollection<BasicBlock>
         if (k == 0)
             return null;
 
-        BasicBlock block = blocks[map[segment].Values[k - 1]];
-        if (block.Bounds.Contains(address))
-            return block;
-        else
-            return null;
+        var block = blocks[map[segment].Values[k - 1]];
+        return block.Bounds.Contains(address) ? block : null;
     }
 
     /// <summary>

@@ -20,14 +20,14 @@ class FixupRecord : Record
     public FixupRecord(RecordReader reader, RecordContext context)
         : base(reader, context)
     {
-        List<FixupThreadDefinition> threads = new List<FixupThreadDefinition>();
-        List<FixupDefinition> fixups = new List<FixupDefinition>();
+        List<FixupThreadDefinition> threads = [];
+        List<FixupDefinition> fixups = [];
         while (!reader.IsEOF)
         {
-            byte b = reader.PeekByte();
+            var b = reader.PeekByte();
             if ((b & 0x80) == 0)
             {
-                FixupThreadDefinition thread = ParseThreadSubrecord(reader);
+                var thread = ParseThreadSubrecord(reader);
                 threads.Add(thread);
                 if (thread.Kind == FixupThreadKind.Target)
                     context.TargetThreads[thread.ThreadNumber] = thread;
@@ -36,12 +36,11 @@ class FixupRecord : Record
             }
             else
             {
-                FixupDefinition fixup = ParseFixupSubrecord(reader, context);
+                var fixup = ParseFixupSubrecord(reader, context);
                 fixups.Add(fixup);
 
-                if (context.LastRecord is LEDATARecord)
+                if (context.LastRecord is LEDATARecord r)
                 {
-                    var r = (LEDATARecord)context.LastRecord;
                     fixup.DataOffset += (ushort)r.DataOffset;
                     r.Segment.Fixups.Add(fixup);
                 }
@@ -64,7 +63,7 @@ class FixupRecord : Record
 
     private FixupThreadDefinition ParseThreadSubrecord(RecordReader reader)
     {
-        FixupThreadDefinition thread = new FixupThreadDefinition();
+        var thread = new FixupThreadDefinition();
 
         byte b = reader.ReadByte();
         thread.Kind = ((b & 0x40) == 0) ? FixupThreadKind.Target : FixupThreadKind.Frame;
@@ -80,7 +79,7 @@ class FixupRecord : Record
 
     private FixupDefinition ParseFixupSubrecord(RecordReader reader, RecordContext context)
     {
-        FixupDefinition fixup = new FixupDefinition();
+        var fixup = new FixupDefinition();
 
         byte b1 = reader.ReadByte();
         byte b2 = reader.ReadByte();
@@ -120,16 +119,18 @@ class FixupRecord : Record
         {
             bool hasTargetDisplacement = (b & 0x04) != 0;
             int targetNumber = b & 3;
-            FixupThreadDefinition thread = context.TargetThreads[targetNumber];
+            var thread = context.TargetThreads[targetNumber];
             if (!thread.IsDefined)
                 throw new InvalidDataException("Target thread " + targetNumber + " is not defined.");
 
-            FixupTargetMethod method = (FixupTargetMethod)((int)thread.Method & 3);
+            var method = (FixupTargetMethod)((int)thread.Method & 3);
             if (hasTargetDisplacement)
                 method |= (FixupTargetMethod)4;
 
-            FixupTarget spec = new FixupTarget();
-            spec.Referent = ResolveFixupReferent(context, method, thread.IndexOrFrame);
+            var spec = new FixupTarget
+            {
+                Referent = ResolveFixupReferent(context, method, thread.IndexOrFrame)
+            };
             if ((int)method <= 3)
             {
                 spec.Displacement = reader.ReadUInt16Or32();
@@ -138,11 +139,13 @@ class FixupRecord : Record
         }
         else
         {
-            FixupTargetMethod method = (FixupTargetMethod)(b & 7);
+            var method = (FixupTargetMethod)(b & 7);
             UInt16 indexOrFrame = reader.ReadIndex();
 
-            FixupTarget spec = new FixupTarget();
-            spec.Referent = ResolveFixupReferent(context, method, indexOrFrame);
+            var spec = new FixupTarget
+            {
+                Referent = ResolveFixupReferent(context, method, indexOrFrame)
+            };
             if ((int)method <= 3)
             {
                 spec.Displacement = reader.ReadUInt16Or32();
@@ -153,25 +156,14 @@ class FixupRecord : Record
     }
 
     private static object ResolveFixupReferent(
-        RecordContext context, FixupTargetMethod method, UInt16 indexOrFrame)
-    {
-        switch (method)
+        RecordContext context, FixupTargetMethod method, UInt16 indexOrFrame) => method switch
         {
-            case FixupTargetMethod.Absolute:
-                return indexOrFrame;
-            case FixupTargetMethod.SegmentPlusDisplacement:
-            case FixupTargetMethod.SegmentWithoutDisplacement:
-                return context.Segments[indexOrFrame - 1];
-            case FixupTargetMethod.GroupPlusDisplacement:
-            case FixupTargetMethod.GroupWithoutDisplacement:
-                return context.Groups[indexOrFrame - 1];
-            case FixupTargetMethod.ExternalPlusDisplacement:
-            case FixupTargetMethod.ExternalWithoutDisplacement:
-                return context.ExternalNames[indexOrFrame - 1];
-            default:
-                throw new InvalidDataException("Invalid fixup target method: " + method);
-        }
-    }
+            FixupTargetMethod.Absolute => indexOrFrame,
+            FixupTargetMethod.SegmentPlusDisplacement or FixupTargetMethod.SegmentWithoutDisplacement => context.Segments[indexOrFrame - 1],
+            FixupTargetMethod.GroupPlusDisplacement or FixupTargetMethod.GroupWithoutDisplacement => context.Groups[indexOrFrame - 1],
+            FixupTargetMethod.ExternalPlusDisplacement or FixupTargetMethod.ExternalWithoutDisplacement => context.ExternalNames[indexOrFrame - 1],
+            _ => throw new InvalidDataException("Invalid fixup target method: " + method),
+        };
 }
 
 /// <summary>

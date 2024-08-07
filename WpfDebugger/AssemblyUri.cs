@@ -121,7 +121,7 @@ public class AssemblyUri : Uri
     private static string MakeUriString(
         Assembly assembly, IAddressReferent referent, int offset)
     {
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
 
         if (assembly != null) // absolute uri
         {

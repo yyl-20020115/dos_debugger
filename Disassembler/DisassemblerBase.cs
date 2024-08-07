@@ -53,7 +53,7 @@ public abstract class DisassemblerBase(BinaryImage image)
     /// </summary>
     public void GenerateBasicBlocks(Address entryPoint, XRefType entryType)
     {
-        Address address = entryPoint;
+        var address = entryPoint;
 
         // Maintain a queue of basic block entry points to analyze. At
         // the beginning, only the user-specified entry point is in the
@@ -70,7 +70,7 @@ public abstract class DisassemblerBase(BinaryImage image)
 
         // Create a a dummy xref entry using the user-supplied starting
         // address.
-        xrefQueue.Enqueue(new XRef(
+        xrefQueue.Enqueue(new (
             type: entryType,
             source: Address.Invalid,
             target: entryPoint
@@ -83,7 +83,7 @@ public abstract class DisassemblerBase(BinaryImage image)
         // jump table.
         while (!xrefQueue.IsEmpty)
         {
-            XRef entry = xrefQueue.Dequeue();
+            var entry = xrefQueue.Dequeue();
 
             // Handle jump table entry, whose Target == Invalid.
             if (entry.Type == XRefType.NearIndexedJump)
@@ -104,7 +104,7 @@ public abstract class DisassemblerBase(BinaryImage image)
             }
 
             // Process the basic block starting at the target address.
-            BasicBlock block = AnalyzeBasicBlock(entry, xrefQueue);
+            var block = AnalyzeBasicBlock(entry, xrefQueue);
             if (block != null)
             {
                 //int count = block.Length;
@@ -132,7 +132,7 @@ public abstract class DisassemblerBase(BinaryImage image)
     /// </summary>
     protected virtual void GenerateControlFlowGraph()
     {
-        foreach (XRef xref in CrossReferences)
+        foreach (var xref in CrossReferences)
         {
             // Skip xrefs with unknown source (e.g. user-specified entry
             // point) or target (e.g. dynamic call or jump).
@@ -145,8 +145,8 @@ public abstract class DisassemblerBase(BinaryImage image)
 
             // Find the basic blocks that owns the source location
             // and target location.
-            BasicBlock sourceBlock = BasicBlocks.Find(xref.Source);
-            BasicBlock targetBlock = BasicBlocks.Find(xref.Target);
+            var sourceBlock = BasicBlocks.Find(xref.Source);
+            var targetBlock = BasicBlocks.Find(xref.Target);
 #if true
             if (sourceBlock == null || targetBlock == null)
             {
@@ -166,19 +166,19 @@ public abstract class DisassemblerBase(BinaryImage image)
 
     protected virtual void GenerateProcedures()
     {
-        foreach (XRef xref in CrossReferences)
+        foreach (var xref in CrossReferences)
         {
-            Address entryPoint = xref.Target;
+            var entryPoint = xref.Target;
             if (entryPoint == Address.Invalid)
                 continue;
-            CallType callType =
+            var callType =
                 (xref.Type == XRefType.NearCall) ? CallType.Near :
                 (xref.Type == XRefType.FarCall) ? CallType.Far : CallType.Unknown;
             if (callType == CallType.Unknown)
                 continue;
 
             // Create a procedure at this entry point if none exists.
-            Procedure proc = Procedures.Find(entryPoint);
+            var proc = Procedures.Find(entryPoint);
             if (proc == null)
             {
                 proc = CreateProcedure(entryPoint);
@@ -204,7 +204,7 @@ public abstract class DisassemblerBase(BinaryImage image)
     {
         // If there is already a procedure defined at the given entry
         // point, return that procedure.
-        Procedure proc = Procedures.Find(entryPoint);
+        var proc = Procedures.Find(entryPoint);
         if (proc != null)
             return proc;
 
@@ -227,7 +227,7 @@ public abstract class DisassemblerBase(BinaryImage image)
         }
 #endif
 
-        CodeFeatures callFeatures = features & (
+        var callFeatures = features & (
             CodeFeatures.HasRETN | CodeFeatures.HasRETF | CodeFeatures.HasIRET);
         switch (callFeatures)
         {
@@ -305,7 +305,7 @@ public abstract class DisassemblerBase(BinaryImage image)
     /// <param name="xrefs"></param>
     protected virtual void AddBasicBlocksToProcedures()
     {
-        foreach (Procedure proc in Procedures)
+        foreach (var proc in Procedures)
         {
             AddBasicBlocksToProcedure(proc);
         }
@@ -321,7 +321,7 @@ public abstract class DisassemblerBase(BinaryImage image)
     {
         // TODO: introduce ProcedureAlias, so that we don't need to
         // analyze the same procedure twice.
-        BasicBlock block = BasicBlocks.Find(proc.EntryPoint);
+        var block = BasicBlocks.Find(proc.EntryPoint);
         if (block == null)
             return false;
 
@@ -330,11 +330,11 @@ public abstract class DisassemblerBase(BinaryImage image)
 
         while (queue.Count > 0)
         {
-            BasicBlock parent = queue.Pop();
+            var parent = queue.Pop();
             if (!proc.BasicBlocks.Contains(parent))
             {
                 proc.AddBasicBlock(parent);
-                foreach (BasicBlock child in BasicBlocks.ControlFlowGraph.GetSuccessors(parent))
+                foreach (var child in BasicBlocks.ControlFlowGraph.GetSuccessors(parent))
                 {
                     queue.Push(child);
                 }
@@ -872,7 +872,7 @@ public abstract class DisassemblerBase(BinaryImage image)
 
     private Address GetLastInstructionInBasicBlock(BasicBlock block)
     {
-        Address ip = block.Bounds.End - 1;
+        var ip = block.Bounds.End - 1;
         while (!image[ip].IsLeadByte)
             ip = ip - 1;
         return ip;

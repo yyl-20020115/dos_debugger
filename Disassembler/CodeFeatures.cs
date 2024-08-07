@@ -31,7 +31,7 @@ public static class CodeFeaturesHelper // may rename to CodeAnalyzer, or
 {
     public static CodeFeatures GetFeatures(Instruction instruction)
     {
-        CodeFeatures features = CodeFeatures.None;
+        var features = CodeFeatures.None;
         switch (instruction.Operation)
         {
             case Operation.INT:
@@ -57,7 +57,7 @@ public static class CodeFeaturesHelper // may rename to CodeAnalyzer, or
     public static CodeFeatures GetFeatures(IEnumerable<Instruction> instructions)
     {
         CodeFeatures features= CodeFeatures.None;
-        foreach (Instruction instruction in instructions)
+        foreach (var instruction in instructions)
         {
             features |= GetFeatures(instruction);
         }

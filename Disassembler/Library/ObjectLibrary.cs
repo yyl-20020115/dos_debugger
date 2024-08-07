@@ -35,8 +35,7 @@ public class ObjectLibrary : Assembly
 
     public string Name => System.IO.Path.GetFileName(FileName);
 
-    public readonly SortedDictionary<string, List<ObjectModule>> Symbols
-        = [];
+    public readonly SortedDictionary<string, List<ObjectModule>> Symbols = [];
 
     public LibraryImage Image { get; set; }
 
@@ -56,7 +55,7 @@ public class ObjectLibrary : Assembly
         if (name == null)
             throw new ArgumentNullException(nameof(name));
 
-        foreach (ObjectModule module in Modules.Cast<ObjectModule>())
+        foreach (var module in Modules.Cast<ObjectModule>())
         {
             if (module.Name == name)
                 return module;
@@ -67,9 +66,9 @@ public class ObjectLibrary : Assembly
     public void AssignIdsToSegments()
     {
         this.Image = new LibraryImage();
-        foreach (ObjectModule module in Modules.Cast<ObjectModule>())
+        foreach (var module in Modules.Cast<ObjectModule>())
         {
-            foreach (LogicalSegment segment in module.Segments)
+            foreach (var segment in module.Segments)
             {
                 segment.Id = Image.Segments.Count;
                 Image.Segments.Add(new LibrarySegment(segment));
@@ -82,9 +81,9 @@ public class ObjectLibrary : Assembly
         Dictionary<string, DefinedSymbol> publicNames = [];
 
         // First, build a map of each public name.
-        foreach (ObjectModule module in Modules.Cast<ObjectModule>())
+        foreach (var module in Modules.Cast<ObjectModule>())
         {
-            foreach (DefinedSymbol name in module.DefinedNames)
+            foreach (var name in module.DefinedNames)
             {
                 if (!Symbols.TryGetValue(name.Name, out List<ObjectModule> definitionList))
                 {
@@ -98,7 +97,7 @@ public class ObjectLibrary : Assembly
 
         // Next, try to resolve each external symbol.
         // TODO: check aliases.
-        foreach (ObjectModule module in Modules.Cast<ObjectModule>())
+        foreach (var module in Modules.Cast<ObjectModule>())
         {
             foreach (var name in module.ExternalNames)
             {

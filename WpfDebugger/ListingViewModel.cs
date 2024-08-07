@@ -169,25 +169,13 @@ public class ListingViewModel
 #endif
     }
 
-    private static bool IsLeadByteOfCode(ByteAttribute b)
-    {
-        return (b.Type == ByteType.Code && b.IsLeadByte);
-    }
+    private static bool IsLeadByteOfCode(ByteAttribute b) => (b.Type == ByteType.Code && b.IsLeadByte);
 
-    private static bool IsLeadByteOfData(ByteAttribute b)
-    {
-        return (b.Type == ByteType.Data && b.IsLeadByte);
-    }
+    private static bool IsLeadByteOfData(ByteAttribute b) => (b.Type == ByteType.Data && b.IsLeadByte);
 
-    public BinaryImage Image
-    {
-        get { return image; }
-    }
+    public BinaryImage Image => image;
 
-    public List<ListingRow> Rows
-    {
-        get { return rows; }
-    }
+    public List<ListingRow> Rows => rows;
 
 #if false
     /// <summary>
@@ -263,28 +251,16 @@ public abstract class ListingRow
         this.location = location;
     }
 
-    public Assembly Assembly
-    {
-        get { return assembly; }
-    }
+    public Assembly Assembly => assembly;
 
     /// <summary>
     /// Gets the address of the listing row.
     /// </summary>
-    public Address Location
-    {
-        get { return location; }
-    }
+    public Address Location => location;
 
-    public string LocationString
-    {
-        get { return assembly.GetImage().FormatAddress(location); }
-    }
+    public string LocationString => assembly.GetImage().FormatAddress(location);
 
-    public virtual Color ForeColor
-    {
-        get { return Colors.Black; }
-    }
+    public virtual Color ForeColor => Colors.Black;
 
     /// <summary>
     /// Gets the opcode bytes of this listing row. Must not be null.
@@ -313,7 +289,7 @@ public abstract class ListingRow
         get
         {
             // Check whether we have a procedure starting at this address.
-            Procedure proc = assembly.GetImage().Procedures.Find(this.Location);
+            var proc = assembly.GetImage().Procedures.Find(this.Location);
             if (proc != null)
                 return proc.Name;
             else
@@ -333,14 +309,14 @@ public abstract class ListingRow
 
     public static string FormatBinary(byte[] data, int startIndex, int count)
     {
-        StringBuilder sb = new StringBuilder();
+        var builder = new StringBuilder();
         for (int i = 0; i < count; i++)
         {
             if (i > 0)
-                sb.Append(' ');
-            sb.AppendFormat("{0:x2}", data[startIndex + i]);
+                builder.Append(' ');
+            builder.AppendFormat("{0:x2}", data[startIndex + i]);
         }
-        return sb.ToString();
+        return builder.ToString();
     }
 }
 
@@ -372,10 +348,7 @@ class BlankListingRow : ListingRow
         get { return data; }
     }
 
-    public override string Text
-    {
-        get { return string.Format("{0} unanalyzed bytes.", data.Length); }
-    }
+    public override string Text => string.Format($"{{0}} unanalyzed bytes.", data.Length);
 
 #if false
     public override ListViewItem CreateViewItem()
@@ -387,37 +360,20 @@ class BlankListingRow : ListingRow
 #endif
 }
 
-class CodeListingRow : ListingRow
+class CodeListingRow(Assembly assembly, Address location, Instruction instruction, byte[] code) : ListingRow(assembly, location)
 {
-    private Instruction instruction;
-    private byte[] code;
-    private string strInstruction;
-
-    public CodeListingRow(Assembly assembly, Address location, Instruction instruction, byte[] code)
-        : base(assembly, location)
-    {
-        this.instruction = instruction;
-        this.code = code;
-        //this.strInstruction = instruction.ToString();
-        this.strInstruction =
+    private Instruction instruction = instruction;
+    private byte[] code = code;
+    private string strInstruction =
             new SymbolicInstructionFormatter().FormatInstruction(instruction);
-    }
 
-    public Instruction Instruction
-    {
-        get { return this.instruction; }
-    }
+    public Instruction Instruction => this.instruction;
 
-    public override byte[] Opcode
-    {
-        get { return code; }
-    }
+    public override byte[] Opcode => code;
 
     public override string Text
-    {
         //get { return instruction.ToString(); }
-        get { return strInstruction; }
-    }
+        => strInstruction;
 
     public override string RichText
     {
@@ -455,28 +411,15 @@ class DataListingRow : ListingRow
         this.data = data;
     }
 
-    public override byte[] Opcode
-    {
-        get { return data; }
-    }
+    public override byte[] Opcode => data;
 
-    public override string Text
+    public override string Text => data.Length switch
     {
-        get
-        {
-            switch (data.Length)
-            {
-                case 1:
-                    return string.Format("db {0:x2}", data[0]);
-                case 2:
-                    return string.Format("dw {0:x4}", BitConverter.ToUInt16(data, 0));
-                case 4:
-                    return string.Format("dd {0:x8}", BitConverter.ToUInt32(data, 0));
-                default:
-                    return "** data **";
-            }
-        }
-    }
+        1 => string.Format("db {0:x2}", data[0]),
+        2 => string.Format("dw {0:x4}", BitConverter.ToUInt16(data, 0)),
+        4 => string.Format("dd {0:x8}", BitConverter.ToUInt32(data, 0)),
+        _ => "** data **",
+    };
 }
 
 class ErrorListingRow : ListingRow
@@ -489,20 +432,11 @@ class ErrorListingRow : ListingRow
         this.error = error;
     }
 
-    public override Color ForeColor
-    {
-        get { return Colors.Red; }
-    }
+    public override Color ForeColor => Colors.Red;
 
-    public override byte[] Opcode
-    {
-        get { return new byte[0]; }
-    }
+    public override byte[] Opcode => [];
 
-    public override string Text
-    {
-        get { return error.Message; }
-    }
+    public override string Text => error.Message;
 
 #if false
     public override ListViewItem CreateViewItem()
@@ -524,15 +458,9 @@ class LabelListingRow : ListingRow
         this.block = block;
     }
 
-    public override byte[] Opcode
-    {
-        get { return null; }
-    }
+    public override byte[] Opcode => null;
 
-    public override string Text
-    {
-        get { return string.Format("loc_{0}", block.Location.Offset); }
-    }
+    public override string Text => $"loc_{block.Location.Offset}";
 
 #if false
     public override ListViewItem CreateViewItem()
@@ -546,14 +474,9 @@ class LabelListingRow : ListingRow
 #endif
 }
 
-public class ProcedureItem
+public class ProcedureItem(Procedure procedure)
 {
-    public ProcedureItem(Procedure procedure)
-    {
-        this.Procedure = procedure;
-    }
-
-    public Procedure Procedure { get; private set; }
+    public Procedure Procedure { get; private set; } = procedure;
 
     /// <summary>
     /// Gets or sets the index of the first row to display for this
@@ -567,10 +490,7 @@ public class ProcedureItem
     /// </summary>
     //public int LastRowIndex { get; set; }
 
-    public override string ToString()
-    {
-        return Procedure.EntryPoint.ToString();
-    }
+    public override string ToString() => Procedure.EntryPoint.ToString();
 }
 
 #if false
@@ -595,7 +515,7 @@ public class SegmentItem
 }
 #endif
 
-public enum ListingScope
+public enum ListingScope : int
 {
     /// <summary>
     /// Displays only the current procedure. If this procedure crosses

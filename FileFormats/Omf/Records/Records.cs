@@ -152,17 +152,14 @@ public abstract class Record
         this.RecordNumber = reader.RecordNumber;
     }
 
-    internal static Record ReadRecord(BinaryReader binaryReader, RecordContext context)
-    {
-        return ReadRecord(binaryReader, context, RecordNumber.None);
-    }
+    internal static Record ReadRecord(BinaryReader binaryReader, RecordContext context) => ReadRecord(binaryReader, context, RecordNumber.None);
 
     internal static Record ReadRecord(
         BinaryReader binaryReader, 
         RecordContext context,
         RecordNumber expectedRecord)
     {
-        RecordReader reader = new RecordReader(binaryReader);
+        var reader = new RecordReader(binaryReader);
         if (expectedRecord != RecordNumber.None &&
             reader.RecordNumber != expectedRecord)
         {
@@ -381,11 +378,12 @@ class CEXTDEFRecord : Record
             }
             UInt16 typeIndex = reader.ReadIndex();
 
-            ExternalNameDefinition def = new ExternalNameDefinition();
-
-            def.Name = context.Names[nameIndex - 1];
-            def.TypeIndex = typeIndex;
-            def.DefinedBy = reader.RecordNumber;
+            var def = new ExternalNameDefinition
+            {
+                Name = context.Names[nameIndex - 1],
+                TypeIndex = typeIndex,
+                DefinedBy = reader.RecordNumber
+            };
             context.ExternalNames.Add(def);
         }
         int endIndex = context.ExternalNames.Count;
@@ -432,14 +430,16 @@ class PUBDEFRecord : Record
         int startIndex = context.PublicNames.Count;
         while (!reader.IsEOF)
         {
-            PublicNameDefinition def = new PublicNameDefinition();
-            def.DefinedBy = reader.RecordNumber;
-            def.BaseGroup = BaseGroup;
-            def.BaseSegment = BaseSegment;
-            def.BaseFrame = BaseFrame;
-            def.Name = reader.ReadPrefixedString();
-            def.Offset = (int)reader.ReadUInt16Or32();
-            def.TypeIndex = reader.ReadIndex();
+            var def = new PublicNameDefinition
+            {
+                DefinedBy = reader.RecordNumber,
+                BaseGroup = BaseGroup,
+                BaseSegment = BaseSegment,
+                BaseFrame = BaseFrame,
+                Name = reader.ReadPrefixedString(),
+                Offset = (int)reader.ReadUInt16Or32(),
+                TypeIndex = reader.ReadIndex()
+            };
             context.PublicNames.Add(def);
         }
         int endIndex = context.PublicNames.Count;
@@ -467,12 +467,14 @@ class COMDEFRecord : Record
         int startIndex = context.ExternalNames.Count;
         while (!reader.IsEOF)
         {
-            CommunalNameDefinition def = new CommunalNameDefinition();
-            def.DefinedBy = reader.RecordNumber;
-            def.Name = reader.ReadPrefixedString();
-            def.TypeIndex = reader.ReadIndex();
-            def.DataType = reader.ReadByte();
-            def.ElementCount = ReadEncodedInteger(reader);
+            var def = new CommunalNameDefinition
+            {
+                DefinedBy = reader.RecordNumber,
+                Name = reader.ReadPrefixedString(),
+                TypeIndex = reader.ReadIndex(),
+                DataType = reader.ReadByte(),
+                ElementCount = ReadEncodedInteger(reader)
+            };
             if (def.DataType == 0x61) // FAR data: count, elemsize
                 def.ElementSize = ReadEncodedInteger(reader);
             else
@@ -486,15 +488,8 @@ class COMDEFRecord : Record
 
     private static UInt32 ReadEncodedInteger(RecordReader reader)
     {
-        byte b = reader.ReadByte();
-        if (b == 0x81)
-            return reader.ReadUInt16();
-        else if (b == 0x84)
-            return reader.ReadUInt24();
-        else if (b == 0x88)
-            return reader.ReadUInt32();
-        else
-            return b;
+        var b = reader.ReadByte();
+        return b == 0x81 ? reader.ReadUInt16() : b == 0x84 ? reader.ReadUInt24() : b == 0x88 ? reader.ReadUInt32() : b;
     }
 }
 
@@ -513,7 +508,7 @@ public class ListOfNamesRecord : Record
     internal ListOfNamesRecord(RecordReader reader, RecordContext context)
         : base(reader, context)
     {
-        List<string> names = new List<string>();
+        List<string> names = [];
         while (!reader.IsEOF)
         {
             names.Add(reader.ReadPrefixedString());
@@ -624,9 +619,11 @@ class ALIASRecord : Record
         int startIndex = context.Aliases.Count;
         while (!reader.IsEOF)
         {
-            AliasDefinition def = new AliasDefinition();
-            def.AliasName = reader.ReadPrefixedString();
-            def.SubstituteName = reader.ReadPrefixedString();
+            AliasDefinition def = new()
+            {
+                AliasName = reader.ReadPrefixedString(),
+                SubstituteName = reader.ReadPrefixedString()
+            };
             context.Aliases.Add(def);
         }
         int endIndex = context.Aliases.Count;

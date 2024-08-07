@@ -1,33 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Disassembler;
 
-internal class Graph<T1, T2>
+public abstract class Graph<TNode, TEdge> where TEdge : IGraphEdge<TNode>
 {
-    public Graph()
-    {
-    }
+    public Graph() { }
+    public List<TEdge> Edges { get; internal set; } = [];
 
-    public List<XRef> Edges { get; internal set; } = [];
+    public void AddEdge(TEdge xref) => this.Edges.Add(xref);
 
-    public void AddEdge(XRef xref)
-    {
-        this.Edges.Add(xref);
-    }
+    public void Clear() => this.Edges.Clear();
 
-    public void Clear()
-    {
-        this.Edges.Clear();
-    }
+    public abstract IEnumerable<TEdge> GetIncomingEdges(TNode source);
 
-    public IEnumerable<XRef> GetIncomingEdges(Address source)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IEnumerable<XRef> GetOutgoingEdges(Address source)
-    {
-        throw new NotImplementedException();
-    }
+    public abstract IEnumerable<TEdge> GetOutgoingEdges(TNode target);
+}
+public class AddressXRefGraph : Graph<Address, XRef>
+{
+    public override IEnumerable<XRef> GetIncomingEdges(Address source) => this.Edges.Where(e => e.Source == source);
+    public override IEnumerable<XRef> GetOutgoingEdges(Address target) => this.Edges.Where(e => e.Target == target);
 }

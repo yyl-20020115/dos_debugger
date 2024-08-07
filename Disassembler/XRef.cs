@@ -78,11 +78,8 @@ public class XRef : IGraphEdge<Address>
     public static int CompareByLocation(XRef x, XRef y)
     {
         int cmp = x.Source.CompareTo(y.Source);
-        if (cmp == 0)
-            cmp = x.Target.CompareTo(y.Target);
-        if (cmp == 0)
-            cmp = x.DataLocation.CompareTo(y.DataLocation);
-        return cmp;
+        cmp = cmp == 0 ? x.Target.CompareTo(y.Target) : cmp;
+        return cmp == 0 ? x.DataLocation.CompareTo(y.DataLocation) : cmp;
     }
 
     /// <summary>
@@ -90,10 +87,7 @@ public class XRef : IGraphEdge<Address>
     /// with a smaller numeric Type value has higher precedence, and 
     /// compare smaller (as in a min-priority queue).
     /// </summary>
-    public static int CompareByPriority(XRef x, XRef y)
-    {
-        return (int)x.Type - (int)y.Type;
-    }
+    public static int CompareByPriority(XRef x, XRef y) => (int)x.Type - (int)y.Type;
 }
 
 /// <summary>
@@ -213,7 +207,7 @@ XREF_RETURN_FROM_INTERRUPT = 6,
 // because we are much more than a collection!
 public class XRefCollection : ICollection<XRef>
 {
-    readonly Graph<Address, XRef> graph = new();
+    readonly AddressXRefGraph graph = new();
 
     /// <summary>
     /// Creates a cross reference collection.

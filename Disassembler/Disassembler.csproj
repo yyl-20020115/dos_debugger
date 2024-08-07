@@ -116,6 +116,7 @@
     </Compile>
     <Compile Include="Symbol.cs" />
     <Compile Include="Symbolic.cs" />
+    <Compile Include="XMLUtils.cs" />
     <Compile Include="XRef.cs" />
   </ItemGroup>
   <ItemGroup>

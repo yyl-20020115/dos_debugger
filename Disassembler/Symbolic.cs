@@ -3,31 +3,6 @@ using System.ComponentModel;
 using X86Codec;
 
 namespace Disassembler;
-
-public static class XMLUtils
-{
-    public static string EscapeXml(this string xmlString)
-    {
-        xmlString = xmlString.Replace("&amp;", "&");
-        xmlString = xmlString.Replace("&lt;", "<");
-        xmlString = xmlString.Replace("&gt;", ">");
-        xmlString = xmlString.Replace("&quot;", "\"");
-        xmlString = xmlString.Replace("&apos;", "'");
-        xmlString = xmlString.Replace("&#39;", "'");
-        return xmlString;
-    }
-    public static string UnescapeXml(this string xmlString)
-    {
-        xmlString = xmlString.Replace("&", "&amp;");
-        xmlString = xmlString.Replace("<", "&lt;");
-        xmlString = xmlString.Replace(">", "&gt;");
-        xmlString = xmlString.Replace("\"", "&quot;");
-        xmlString = xmlString.Replace("'", "&apos;");
-        xmlString = xmlString.Replace("'", "&#39;");
-        return xmlString;
-    }
-
-}
 /// <summary>
 /// Represents a target (typically a jump target) that is a symbol that
 /// must be resolved at link-time, or an address with a known label.
@@ -58,7 +33,7 @@ public class SymbolicTarget
     /// </summary>
     public UInt32 Displacement { get; set; }
 
-    public override string ToString() => Displacement == 0 ? Referent.Label : string.Format("{0}+{1:X4}", Referent.Label, Displacement);
+    public override string ToString() => Displacement == 0 ? Referent.Label : $"{Referent.Label}+{Displacement:X4}";
 
 #if false
     public override string ToString()
@@ -209,7 +184,7 @@ public class SymbolicInstructionFormatter : InstructionFormatter
 
     public override string FormatInstruction(Instruction instruction)
     {
-        string s = base.FormatInstruction(instruction);
+        var s = base.FormatInstruction(instruction);
 
         // Make "interesting" instructions bold.
         return instruction.Operation switch

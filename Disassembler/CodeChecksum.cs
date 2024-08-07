@@ -36,7 +36,7 @@ public class CodeChecksum
         // really matter whether DFS or BFS is used as long as we stick
         // to it, but BFS has the benefit that it's easier to understand.
         // Therefore we use it.
-        Queue<Address> queue = new Queue<Address>();
+        Queue<Address> queue = new();
         queue.Enqueue(procedure.EntryPoint);
 
         // Map the entry point address of a basic block to its index
@@ -45,14 +45,14 @@ public class CodeChecksum
         // an index the first time it is encountered. This index is
         // included in the hash to provide a hint of the graph's
         // structure.
-        Dictionary<Address, int> visitOrder = new Dictionary<Address, int>();
+        Dictionary<Address, int> visitOrder = [];
 
-        XRefCollection cfg = image.BasicBlocks.ControlFlowGraph.Graph;
+        var cfg = image.BasicBlocks.ControlFlowGraph.Graph;
 
         // Traverse the graph.
         while (queue.Count > 0)
         {
-            Address source = queue.Dequeue();
+            var source = queue.Dequeue();
 
             // Check if this block has been visited before. If it has,
             // we just hash its order and work on next one.
@@ -87,7 +87,7 @@ public class CodeChecksum
             // from the left-side one.
             while (true)
             {
-                BasicBlock block = image.BasicBlocks.Find(source);
+                var block = image.BasicBlocks.Find(source);
                 System.Diagnostics.Debug.Assert(block != null);
 
                 // Hash the instructions in the block. Only the opcode
@@ -108,7 +108,7 @@ public class CodeChecksum
                 // TBD: handle multiple outgoing edges.
                 XRef fallThroughEdge = null;
                 XRef nonFallThroughEdge = null;
-                foreach (XRef flow in cfg.GetReferencesFrom(source))
+                foreach (var flow in cfg.GetReferencesFrom(source))
                 {
                     if (flow.Type == XRefType.FallThrough)
                     {
@@ -147,7 +147,7 @@ public class CodeChecksum
     private static void ComputeMore(HashAlgorithm hasher, int data)
     {
         // TODO: make this thread local to save the byte array allocation.
-        byte[] bytes = BitConverter.GetBytes(data);
+        var bytes = BitConverter.GetBytes(data);
         hasher.TransformBlock(bytes, 0, bytes.Length, bytes, 0);
     }
 
@@ -157,11 +157,11 @@ public class CodeChecksum
     private static void ComputeMore(
         HashAlgorithm hasher, BasicBlock basicBlock, BinaryImage image)
     {
-        ArraySegment<byte> code = image.GetBytes(basicBlock.Location, basicBlock.Length);
-        int index = code.Offset;
+        var code = image.GetBytes(basicBlock.Location, basicBlock.Length);
+        var index = code.Offset;
         // TODO: maybe we should subclass X86Codec.Instruction to provide
         // rich functionalities???
-        foreach (Instruction instruction in basicBlock.GetInstructions(image))
+        foreach (var instruction in basicBlock.GetInstructions(image))
         {
             ComputeMore(hasher, code.Array, index, instruction);
             index += instruction.EncodedLength;
@@ -175,8 +175,8 @@ public class CodeChecksum
             throw new ArgumentNullException(nameof(instructions));
 
         // Hash the opcode part of each instruction in the sequence.
-        int index = startIndex;
-        foreach (Instruction instruction in instructions)
+        var index = startIndex;
+        foreach (var instruction in instructions)
         {
             ComputeMore(hasher, code, index, instruction);
             index += instruction.EncodedLength;
@@ -193,8 +193,8 @@ public class CodeChecksum
         // TODO: in X86Codec, since a fixable location always comes after
         // prefix+opcode+modrm+sib, we should put the fixable location as
         // a property of the instruction instead of the operand.
-        int opcodeLength = instruction.EncodedLength;
-        foreach (Operand operand in instruction.Operands)
+        var opcodeLength = instruction.EncodedLength;
+        foreach (var operand in instruction.Operands)
         {
             if (operand.FixableLocation.Length > 0)
                 opcodeLength = Math.Min(opcodeLength, operand.FixableLocation.StartOffset);

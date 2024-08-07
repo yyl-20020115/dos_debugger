@@ -39,7 +39,7 @@ public static class OmfLoader
 
         foreach (var context in FileFormats.Omf.OmfLoader.LoadLibrary(reader))
         {
-            ObjectModule module = LoadObject(context);
+            var module = LoadObject(context);
             library.Modules.Add(module);
         }
         return library;
@@ -55,7 +55,7 @@ public static class OmfLoader
         ObjectLibrary library = new();
 
         var context = FileFormats.Omf.OmfLoader.LoadObject(reader);
-        ObjectModule module = LoadObject(context);
+        var module = LoadObject(context);
         library.Modules.Add(module);
 
         library.AssignIdsToSegments();
@@ -80,25 +80,25 @@ public static class OmfLoader
         module.SourceName = context.SourceName;
 
         // Convert segments.
-        foreach (SegmentDefinition def in context.Segments)
+        foreach (var def in context.Segments)
         {
-            LogicalSegment segment = ConvertSegmentDefinition(def, objectMap, module);
+            var segment = ConvertSegmentDefinition(def, objectMap, module);
             objectMap[def] = segment;
             module.Segments.Add(segment);
         }
 
         // Convert segment groups.
-        foreach (GroupDefinition def in context.Groups)
+        foreach (var def in context.Groups)
         {
-            SegmentGroup group = ConvertGroupDefinition(def, objectMap);
+            var group = ConvertGroupDefinition(def, objectMap);
             module.Groups.Add(group);
             objectMap[def] = group;
         }
 
         // Convert external names.
-        foreach (ExternalNameDefinition def in context.ExternalNames)
+        foreach (var def in context.ExternalNames)
         {
-            ExternalSymbol symbol = new ExternalSymbol
+            var symbol = new ExternalSymbol
             {
                 Name = def.Name,
                 TypeIndex = def.TypeIndex,
@@ -108,7 +108,7 @@ public static class OmfLoader
         }
 
         // Convert aliases.
-        foreach (AliasDefinition def in context.Aliases)
+        foreach (var def in context.Aliases)
         {
             module.Aliases.Add(new SymbolAlias
             {
@@ -118,16 +118,16 @@ public static class OmfLoader
         }
 
         // Convert public names.
-        foreach (PublicNameDefinition def in context.PublicNames)
+        foreach (var def in context.PublicNames)
         {
             module.DefinedNames.Add(ConvertPublicNameDefinition(def, objectMap));
         }
 
         // Convert fixups.
-        foreach (SegmentDefinition def in context.Segments)
+        foreach (var def in context.Segments)
         {
-            LogicalSegment segment = (LogicalSegment)objectMap[def];
-            foreach (FixupDefinition f in def.Fixups)
+            var segment = objectMap[def] as LogicalSegment;
+            foreach (var f in def.Fixups)
             {
                 segment.Fixups.Add(ConvertFixupDefinition(f, objectMap));
             }
@@ -138,29 +138,28 @@ public static class OmfLoader
 
     private static LogicalSegment ConvertSegmentDefinition(
         SegmentDefinition def, Dictionary<object, object> objectMap,
-        ObjectModule module)
-    {
+        ObjectModule module) =>
         // Convert the record.
-        LogicalSegment segment = new LogicalSegment(def, objectMap, module);
-        return segment;
-    }
+        new (def, objectMap, module);
 
     private static Fixup ConvertFixupDefinition(
         FixupDefinition def, Dictionary<object, object> objectMap)
     {
-        Fixup fixup = new();
-        fixup.StartIndex = def.DataOffset;
-        fixup.LocationType = def.Location switch
+        Fixup fixup = new()
         {
-            FixupLocation.LowByte => FixupLocationType.LowByte,
-            FixupLocation.Offset or FixupLocation.LoaderResolvedOffset => FixupLocationType.Offset,
-            FixupLocation.Base => FixupLocationType.Base,
-            FixupLocation.Pointer => FixupLocationType.Pointer,
-            _ => throw new InvalidDataException("The fixup location is not supported."),
+            StartIndex = def.DataOffset,
+            LocationType = def.Location switch
+            {
+                FixupLocation.LowByte => FixupLocationType.LowByte,
+                FixupLocation.Offset or FixupLocation.LoaderResolvedOffset => FixupLocationType.Offset,
+                FixupLocation.Base => FixupLocationType.Base,
+                FixupLocation.Pointer => FixupLocationType.Pointer,
+                _ => throw new InvalidDataException("The fixup location is not supported."),
+            },
+            Mode = def.Mode
         };
-        fixup.Mode = def.Mode;
 
-        IAddressReferent referent = def.Target.Referent is UInt16 v ? new PhysicalAddress(v, 0) : (IAddressReferent)objectMap[def.Target.Referent];
+        var referent = def.Target.Referent is UInt16 v ? new PhysicalAddress(v, 0) : (IAddressReferent)objectMap[def.Target.Referent];
         fixup.Target = new SymbolicTarget
         {
             Referent = (IAddressReferent)referent,
@@ -186,18 +185,14 @@ public static class OmfLoader
     }
 
     private static DefinedSymbol ConvertPublicNameDefinition(
-        PublicNameDefinition def, Dictionary<object, object> objectMap)
-    {
-        DefinedSymbol symbol = new();
-        if (def.BaseGroup != null)
-            symbol.BaseGroup = (SegmentGroup)objectMap[def.BaseGroup];
-        if (def.BaseSegment != null)
-            symbol.BaseSegment = (LogicalSegment)objectMap[def.BaseSegment];
-        symbol.BaseFrame = def.BaseFrame;
-        symbol.Name = def.Name;
-        symbol.TypeIndex = def.TypeIndex;
-        symbol.Offset = (uint)def.Offset;
-        symbol.Scope = def.IsLocal ? SymbolScope.Private : SymbolScope.Public;
-        return symbol;
-    }
+        PublicNameDefinition def, Dictionary<object, object> objectMap) => new()
+        {
+            BaseFrame = def.BaseFrame,
+            Name = def.Name,
+            TypeIndex = def.TypeIndex,
+            Offset = (uint)def.Offset,
+            Scope = def.IsLocal ? SymbolScope.Private : SymbolScope.Public,
+            BaseGroup = def.BaseGroup != null ? objectMap[def.BaseGroup] as SegmentGroup : null,
+            BaseSegment = def.BaseSegment != null ? objectMap[def.BaseSegment] as LogicalSegment : null
+        };
 }

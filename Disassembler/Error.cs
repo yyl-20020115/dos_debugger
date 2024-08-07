@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace Disassembler;
 
@@ -20,14 +19,9 @@ public class Error(Address location, ErrorCode errorCode, string message)
 
     public ErrorCode ErrorCode { get; } = errorCode;
 
-    public ErrorCategory Category
-    {
-        get
-        {
-            var attribute = ErrorCode.GetAttribute<ErrorCategoryAttribute>();
-            return attribute != null ? attribute.Category : ErrorCategory.Error;
-        }
-    }
+    public ErrorCategory Category 
+        => ErrorCode.GetAttribute<ErrorCategoryAttribute>() is ErrorCategoryAttribute attribute
+                ? attribute.Category : ErrorCategory.Error;
 
     public Address Location => location;
 

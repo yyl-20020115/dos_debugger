@@ -121,7 +121,7 @@ public class RequestPropertyEventArgs(object selectedObject) : EventArgs
 internal class LibraryBrowserViewModel(ObjectLibrary library)
 {
     public LibraryItem[] Libraries { get; private set; } = [new (library)];
-    public LibraryItem Library { get { return Libraries[0]; } }
+    public LibraryItem Library => Libraries[0];
 
     internal class LibraryItem(ObjectLibrary library) : ITreeNode
     {

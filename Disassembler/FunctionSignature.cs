@@ -60,38 +60,38 @@ public static class NameMangler
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="s"></param>
+    /// <param name="decoration"></param>
     /// <returns></returns>
     /// <remarks>
     /// The name decoration of a C function is described at
     /// http://en.wikipedia.org/wiki/Name_mangling#C_name_decoration_in_Microsoft_Windows
     /// </remarks>
-    public static FunctionSignature Demangle(string s)
+    public static FunctionSignature Demangle(string decoration)
     {
-        if (s == null)
-            throw new ArgumentNullException(nameof(s));
-        if (s.Length <= 1)
+        if (decoration == null)
+            throw new ArgumentNullException(nameof(decoration));
+        if (decoration.Length <= 1)
             return null;
 
-        if (s[0] == '_')
+        if (decoration[0] == '_')
         {
-            int at = s.IndexOf('@');
+            int at = decoration.IndexOf('@');
             if (at == -1) // _f
             {
-                return new FunctionSignature
+                return new ()
                 {
                     CallingConvention = CallingConvention.CDecl,
-                    Name = s.Substring(1),
+                    Name = decoration.Substring(1),
                     ParametersSize = -1
                 };
             }
 
-            if (int.TryParse(s.Substring(at + 1), out int paramSize)) // _f@4
+            if (int.TryParse(decoration.Substring(at + 1), out int paramSize)) // _f@4
             {
-                return new FunctionSignature
+                return new ()
                 {
                     CallingConvention = CallingConvention.Pascal,
-                    Name = s.Substring(1, at - 1),
+                    Name = decoration.Substring(1, at - 1),
                     ParametersSize = paramSize
                 };
             }
@@ -99,17 +99,17 @@ public static class NameMangler
             return null;
         }
 
-        if (s[0] == '@') // @f@4 -- fast call
+        if (decoration[0] == '@') // @f@4 -- fast call
         {
-            int at = s.IndexOf('@', 1);
+            int at = decoration.IndexOf('@', 1);
             if (at >= 0)
             {
-                if (int.TryParse(s.Substring(at + 1), out int paramSize))
+                if (int.TryParse(decoration.Substring(at + 1), out int paramSize))
                 {
-                    return new FunctionSignature
+                    return new ()
                     {
                         CallingConvention = CallingConvention.FastCall,
-                        Name = s.Substring(1, at - 1),
+                        Name = decoration.Substring(1, at - 1),
                         ParametersSize = paramSize
                     };
                 }
@@ -117,9 +117,9 @@ public static class NameMangler
             return null;
         }
 
-        if (s[0] == '?')
+        if (decoration[0] == '?')
         {
-            return DemangleCpp(s);
+            return DemangleCpp(decoration);
         }
 
         return null;
@@ -129,7 +129,7 @@ public static class NameMangler
     /// The name mangling method of VC++ is described at
     /// http://en.wikipedia.org/wiki/Visual_C%2B%2B_name_mangling
     /// </remarks>
-    private static FunctionSignature DemangleCpp(string s)
+    private static FunctionSignature DemangleCpp(string decoration)
     {
         return null;
     }

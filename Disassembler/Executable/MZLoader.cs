@@ -98,7 +98,7 @@ public class MZFile
             if (!(address >= 0 && address + 2 <= Image.Length))
                 throw new InvalidDataException("The relocation entry is out-of-range.");
 
-            UInt16 current = BitConverter.ToUInt16(Image, address);
+            var current = BitConverter.ToUInt16(Image, address);
             current += segment;
             Image[address] = (byte)(current & 0xff);
             Image[address + 1] = (byte)(current >> 8);
@@ -110,7 +110,7 @@ public class MZFile
 
     public FarPointer BaseAddress
     {
-        get { return baseAddress; }
+        get => baseAddress;
         set
         {
             if (value.Offset != 0)
