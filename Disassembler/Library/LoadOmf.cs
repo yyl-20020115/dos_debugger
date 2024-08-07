@@ -15,7 +15,7 @@ public static class OmfLoader
     public static ObjectLibrary LoadLibrary(string fileName)
     {
         if (fileName == null)
-            throw new ArgumentNullException("fileName");
+            throw new ArgumentNullException(nameof(fileName));
 
         using var stream = File.OpenRead(fileName);
         using var reader = new BinaryReader(stream);
@@ -33,7 +33,7 @@ public static class OmfLoader
     public static ObjectLibrary LoadLibrary(BinaryReader reader)
     {
         if (reader == null)
-            throw new ArgumentNullException("reader");
+            throw new ArgumentNullException(nameof(reader));
 
         ObjectLibrary library = new();
 
@@ -48,7 +48,7 @@ public static class OmfLoader
     public static ObjectLibrary LoadObject(string fileName)
     {
         if (fileName == null)
-            throw new ArgumentNullException("fileName");
+            throw new ArgumentNullException(nameof(fileName));
 
         using var stream = File.OpenRead(fileName);
         using var reader = new BinaryReader(stream);

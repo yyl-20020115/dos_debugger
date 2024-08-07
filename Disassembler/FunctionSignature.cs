@@ -69,7 +69,7 @@ public static class NameMangler
     public static FunctionSignature Demangle(string s)
     {
         if (s == null)
-            throw new ArgumentNullException("s");
+            throw new ArgumentNullException(nameof(s));
         if (s.Length <= 1)
             return null;
 

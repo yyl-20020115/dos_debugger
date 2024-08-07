@@ -195,7 +195,7 @@ public class ProcedureCollection : ICollection<Procedure>
     public void Add(Procedure procedure)
     {
         if (procedure == null)
-            throw new ArgumentNullException("procedure");
+            throw new ArgumentNullException(nameof(procedure));
 
         if (procMap.ContainsKey(procedure.EntryPoint))
         {

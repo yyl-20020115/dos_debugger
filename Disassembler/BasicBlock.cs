@@ -161,7 +161,7 @@ public class BasicBlockCollection : ICollection<BasicBlock>
     public void Add(BasicBlock block)
     {
         if (block == null)
-            throw new ArgumentNullException("block");
+            throw new ArgumentNullException(nameof(block));
         if (this.Contains(block))
             throw new ArgumentException("Block already exists in the collection.");
 
@@ -210,9 +210,9 @@ public class BasicBlockCollection : ICollection<BasicBlock>
     {
         ++TimesSplit;
         if (block == null)
-            throw new ArgumentNullException("block");
+            throw new ArgumentNullException(nameof(block));
         if (!block.Bounds.Contains(cutoff))
-            throw new ArgumentOutOfRangeException("cutoff");
+            throw new ArgumentOutOfRangeException(nameof(cutoff));
         if (cutoff == block.Location)
             return null;
 

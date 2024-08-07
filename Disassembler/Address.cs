@@ -49,7 +49,7 @@ public struct LogicalAddress
         : this()
     {
         if (referent == null)
-            throw new ArgumentNullException("referent");
+            throw new ArgumentNullException(nameof(referent));
 
         this.referent = referent;
         this.displacement = displacement;
@@ -346,7 +346,7 @@ public struct Pointer
     public static bool TryParse(string s, out Pointer pointer)
     {
         if (s == null)
-            throw new ArgumentNullException("s");
+            throw new ArgumentNullException(nameof(s));
 
         pointer = new Pointer();
 

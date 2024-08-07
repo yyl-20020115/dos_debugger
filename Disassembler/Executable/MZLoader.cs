@@ -17,7 +17,7 @@ public class MZFile
     /// <param name="FileName">Name of the file to open.</param>
     public MZFile(string FileName)
     {
-        this.FileName = FileName ?? throw new ArgumentNullException("fileName");
+        this.FileName = FileName ?? throw new ArgumentNullException(nameof(FileName));
 
         using var stream = new FileStream(this.FileName,
             FileMode.Open, FileAccess.Read, FileShare.Read);

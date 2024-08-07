@@ -24,7 +24,7 @@ namespace WpfDebugger
 
         public Assembly Program
         {
-            get { return program; }
+            get => program;
             set
             {
                 program = value;
@@ -39,11 +39,10 @@ namespace WpfDebugger
 
         private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (!(sender is ListViewItem))
+            if (sender is not ListViewItem)
                 return;
 
-            var item = ((ListViewItem)sender).Content as ProcedureListViewModel.ProcedureItem;
-            if (item == null)
+            if (((ListViewItem)sender).Content is not ProcedureListViewModel.ProcedureItem item)
                 return;
 
             Uri uri = item.Uri;
@@ -51,21 +50,13 @@ namespace WpfDebugger
             RaiseRequestNavigate(uri, targetName);
         }
 
-        private static string GetTargetNameFromModifierKeys()
+        private static string GetTargetNameFromModifierKeys() => Keyboard.Modifiers switch
         {
-            switch (Keyboard.Modifiers)
-            {
-                default:
-                case ModifierKeys.None:
-                    return "asm";
-                case ModifierKeys.Control:
-                    return "asm:_blank";
-                case ModifierKeys.Shift:
-                    return "hex";
-                case ModifierKeys.Control | ModifierKeys.Shift:
-                    return "hex:_blank";
-            }
-        }
+            ModifierKeys.Control => "asm:_blank",
+            ModifierKeys.Shift => "hex",
+            ModifierKeys.Control | ModifierKeys.Shift => "hex:_blank",
+            _ => "asm",
+        };
 
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
@@ -162,7 +153,7 @@ namespace WpfDebugger
 
         public ProcedureListViewModel(Assembly program)
         {
-            this.Items = new List<ProcedureItem>();
+            this.Items = [];
             var list = from proc in program.GetImage().Procedures
                        orderby proc.EntryPoint
                        select proc;
@@ -173,62 +164,21 @@ namespace WpfDebugger
             }
         }
 
-        public class ProcedureItem
+        public class ProcedureItem(Assembly program, Procedure procedure)
         {
-            readonly Assembly program;
-            readonly Procedure procedure;
+            readonly Assembly program = program ?? throw new ArgumentNullException(nameof(program));
 
-            public ProcedureItem( Assembly program, Procedure procedure)
-            {
-                if (program == null)
-                    throw new ArgumentNullException("program");
-                if (procedure == null)
-                    throw new ArgumentNullException("procedure");
+            public Procedure Procedure { get; } = procedure ?? throw new ArgumentNullException(nameof(procedure));
 
-                this.program = program;
-                this.procedure = procedure;
-            }
+            public string Name => Procedure.Name;
 
-            public Procedure Procedure
-            {
-                get { return procedure; }
-            }
+            public Address EntryPoint => Procedure.EntryPoint;
 
-            public string Name
-            {
-                get { return procedure.Name; }
-            }
+            public string EntryPointString => program.GetImage().FormatAddress(Procedure.EntryPoint);
 
-            public Address EntryPoint
-            {
-                get { return procedure.EntryPoint; }
-            }
+            public int Size => Procedure.Size;
 
-            public string EntryPointString
-            {
-                get { return program.GetImage().FormatAddress(procedure.EntryPoint); }
-            }
-
-            public int Size
-            {
-                get { return Procedure.Size; }
-            }
-
-            public Uri Uri
-            {
-                get
-                {
-#if false
-                    var segment = program.GetSegment(procedure.EntryPoint.Segment);
-                    if (segment != null)
-                        return new AssemblyUri(program, segment, procedure.EntryPoint.Offset);
-                    else
-                        return null;
-#else
-                    return new AssemblyUri(program, procedure.EntryPoint);
-#endif
-                }
-            }
+            public Uri Uri => new AssemblyUri(program, Procedure.EntryPoint);
         }
     }
 }

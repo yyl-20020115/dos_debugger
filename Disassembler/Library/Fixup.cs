@@ -154,7 +154,7 @@ public class FixupCollection : IList<Fixup>
     public void Add(Fixup fixup)
     {
         if (fixup == null)
-            throw new ArgumentNullException("fixup");
+            throw new ArgumentNullException(nameof(fixup));
 
         int k = BinarySearch(fixup.StartIndex);
         if (k >= 0) // already exists

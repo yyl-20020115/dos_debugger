@@ -125,7 +125,7 @@ internal class LibraryBrowserViewModel(ObjectLibrary library)
 
     internal class LibraryItem(ObjectLibrary library) : ITreeNode
     {
-        public ObjectLibrary Library { get; private set; } = library ?? throw new ArgumentNullException("library");
+        public ObjectLibrary Library { get; private set; } = library ?? throw new ArgumentNullException(nameof(library));
         public ObservableCollection<ModuleItem> Modules { get; private set; } =
                 new ObservableCollection<ModuleItem>(
                     from ObjectModule module in library.Modules
@@ -150,7 +150,7 @@ internal class LibraryBrowserViewModel(ObjectLibrary library)
 
         public ModuleItem(ObjectModule module)
         {
-            this.Module = module ?? throw new ArgumentNullException("module");
+            this.Module = module ?? throw new ArgumentNullException(nameof(module));
             this.Symbols = [];
 
             ConstantSegmentItem constantGroup = new(module);
@@ -228,7 +228,7 @@ internal class LibraryBrowserViewModel(ObjectLibrary library)
 
     internal class SymbolItem(DefinedSymbol symbol) : ITreeNode
     {
-        public DefinedSymbol Symbol { get; private set; } = symbol ?? throw new ArgumentNullException("symbol");
+        public DefinedSymbol Symbol { get; private set; } = symbol ?? throw new ArgumentNullException(nameof(symbol));
 
         public override string ToString() => Symbol.BaseSegment == null
                 ? $"{Symbol.BaseFrame:X4}:{Symbol.Offset:X4}  {Symbol.Name}"
@@ -274,7 +274,7 @@ internal class LibraryBrowserViewModel(ObjectLibrary library)
 
     internal class SymbolAliasItem(SymbolAlias alias) : ITreeNode
     {
-        public SymbolAlias Alias { get; private set; } = alias ?? throw new ArgumentNullException("alias");
+        public SymbolAlias Alias { get; private set; } = alias ?? throw new ArgumentNullException(nameof(alias));
 
         public override string ToString() => $"{Alias.Name} -> {Alias.SubstituteName}";
 

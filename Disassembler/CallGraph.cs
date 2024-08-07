@@ -41,11 +41,11 @@ public class CallGraph(ProcedureCollection procedures)
     public void AddEdge(Procedure caller, Procedure callee, XRef xref)
     {
         if (caller == null)
-            throw new ArgumentNullException("caller");
+            throw new ArgumentNullException(nameof(caller));
         if (callee == null)
-            throw new ArgumentNullException("callee");
+            throw new ArgumentNullException(nameof(callee));
         if (xref == null)
-            throw new ArgumentNullException("xref");
+            throw new ArgumentNullException(nameof(xref));
 
         System.Diagnostics.Debug.Assert(procedures.Contains(caller));
         System.Diagnostics.Debug.Assert(procedures.Contains(callee));

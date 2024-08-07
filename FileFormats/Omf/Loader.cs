@@ -15,7 +15,7 @@ public static class OmfLoader
     public static IEnumerable<Records.RecordContext> LoadLibrary(string fileName)
     {
         if (fileName == null)
-            throw new ArgumentNullException("fileName");
+            throw new ArgumentNullException(nameof(fileName));
 
         using Stream stream = File.OpenRead(fileName);
         using BinaryReader reader = new(stream);
@@ -32,7 +32,7 @@ public static class OmfLoader
     public static IEnumerable<Records.RecordContext> LoadLibrary(BinaryReader reader)
     {
         if (reader == null)
-            throw new ArgumentNullException("reader");
+            throw new ArgumentNullException(nameof(reader));
 
         LibraryHeaderRecord r = (LibraryHeaderRecord)
             Record.ReadRecord(reader, null, RecordNumber.LibraryHeader);

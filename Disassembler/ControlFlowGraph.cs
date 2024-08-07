@@ -11,11 +11,11 @@ public class ControlFlowGraph(BasicBlockCollection collection)
     public void AddEdge(BasicBlock source, BasicBlock target, XRef xref)
     {
         if (source == null)
-            throw new ArgumentNullException("source");
+            throw new ArgumentNullException(nameof(source));
         if (target == null)
-            throw new ArgumentNullException("target");
+            throw new ArgumentNullException(nameof(target));
         if (xref == null)
-            throw new ArgumentNullException("xref");
+            throw new ArgumentNullException(nameof(xref));
 
         System.Diagnostics.Debug.Assert(blocks.Contains(source));
         System.Diagnostics.Debug.Assert(blocks.Contains(target));

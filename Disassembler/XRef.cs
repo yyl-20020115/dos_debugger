@@ -236,7 +236,7 @@ public class XRefCollection : ICollection<XRef>
     {
         if (xref == null)
         {
-            throw new ArgumentNullException("xref");
+            throw new ArgumentNullException(nameof(xref));
         }
         if (xref.Source == Address.Invalid &&
             xref.Target == Address.Invalid)

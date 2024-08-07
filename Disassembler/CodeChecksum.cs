@@ -172,7 +172,7 @@ public class CodeChecksum
         HashAlgorithm hasher, byte[] code, int startIndex, IEnumerable<Instruction> instructions)
     {
         if (instructions == null)
-            throw new ArgumentNullException("instructions");
+            throw new ArgumentNullException(nameof(instructions));
 
         // Hash the opcode part of each instruction in the sequence.
         int index = startIndex;
@@ -187,7 +187,7 @@ public class CodeChecksum
         HashAlgorithm hasher, byte[] code, int startIndex, Instruction instruction)
     {
         if (instruction == null)
-            throw new ArgumentNullException("instruction");
+            throw new ArgumentNullException(nameof(instruction));
 
         // Find the opcode part.
         // TODO: in X86Codec, since a fixable location always comes after

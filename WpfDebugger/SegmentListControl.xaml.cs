@@ -65,28 +65,13 @@ namespace WpfDebugger
 #endif
     }
 
-    class SegmentViewItem
+    class SegmentViewItem(Segment segment)
     {
-        public Segment Segment { get; private set; }
+        public Segment Segment { get; private set; } = segment ?? throw new ArgumentNullException(nameof(segment));
 
-        public SegmentViewItem(Segment segment)
-        {
-            if (segment == null)
-                throw new ArgumentNullException("segment");
-            this.Segment = segment;
-        }
+        public string Start => "NA";
 
-        public string Start
-        {
-            get { return "NA"; }
-            //FormatAddress(Segment.StartAddress, Segment.SegmentAddress); }
-        }
-
-        public string End
-        {
-            get { return "NA"; }
-            //FormatAddress(Segment.EndAddress - 1, Segment.SegmentAddress); }
-        }
+        public string End => "NA";
 
 #if false
         private static string FormatAddress(LinearPointer address, UInt16 segment)

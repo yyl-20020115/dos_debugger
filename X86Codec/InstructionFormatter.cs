@@ -8,31 +8,31 @@ public class InstructionFormatter
     public virtual string FormatInstruction(Instruction instruction)
     {
         if (instruction == null)
-            throw new ArgumentNullException("instruction");
+            throw new ArgumentNullException(nameof(instruction));
 
-        StringBuilder sb = new StringBuilder();
+        var builder = new StringBuilder();
 
         // Format group 1 (LOCK/REPZ/REPNZ) prefix.
         if ((instruction.Prefix & Prefixes.Group1) != 0)
         {
-            sb.Append((instruction.Prefix & Prefixes.Group1).ToString().ToLowerInvariant());
-            sb.Append(' ');
+            builder.Append((instruction.Prefix & Prefixes.Group1).ToString().ToLowerInvariant());
+            builder.Append(' ');
         }
 
         // Format mnemonic.
-        sb.Append(FormatMnemonic(instruction.Operation));
+        builder.Append(FormatMnemonic(instruction.Operation));
 
         // Format operands.
         for (int i = 0; i < instruction.Operands.Length; i++)
         {
             if (i > 0)
             {
-                sb.Append(',');
+                builder.Append(',');
             }
-            sb.Append(' ');
-            sb.Append(FormatOperand(instruction.Operands[i]));
+            builder.Append(' ');
+            builder.Append(FormatOperand(instruction.Operands[i]));
         }
-        return sb.ToString();
+        return builder.ToString();
     }
 
     //protected virtual void FormatPrefix(StringBuilder sb, Prefixes prefix)

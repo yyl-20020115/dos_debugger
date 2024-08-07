@@ -68,11 +68,11 @@ internal class InstructionReader
     public InstructionReader(byte[] code, int startIndex, int count)
     {
         if (code == null)
-            throw new ArgumentNullException("code");
+            throw new ArgumentNullException(nameof(code));
         if (startIndex < 0 || startIndex >= code.Length)
-            throw new ArgumentOutOfRangeException("startIndex");
+            throw new ArgumentOutOfRangeException(nameof(startIndex));
         if (count < 0 || startIndex + count > code.Length)
-            throw new ArgumentOutOfRangeException("count");
+            throw new ArgumentOutOfRangeException(nameof(count));
 
         this.code = code;
         this.startIndex = startIndex;

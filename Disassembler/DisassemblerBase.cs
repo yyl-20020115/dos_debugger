@@ -12,7 +12,7 @@ namespace Disassembler;
 /// </summary>
 public abstract class DisassemblerBase(BinaryImage image)
 {
-    protected readonly BinaryImage image = image ?? throw new ArgumentNullException("image");
+    protected readonly BinaryImage image = image ?? throw new ArgumentNullException(nameof(image));
 
     /// <summary>
     /// Gets the assembly being analyzed. This property must be overriden

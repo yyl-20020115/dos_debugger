@@ -41,17 +41,8 @@ namespace WpfDebugger
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-#if false
-            //string fileName = @"E:\Dev\Projects\DosDebugger\Test\H.EXE";
-            string fileName = @"E:\Dev\Projects\DosDebugger\Test\New\NEWHELLO.EXE";
+            string fileName = @"..\Data\SPTABLET.COM";
             DoOpenFile(fileName);
-#else
-            //string fileName = @"..\..\..\..\Test\SLIBC7.LIB";
-            //string fileName = @"E:\Dev\Projects\DosDebugger\Test\Q.EXE";
-            string fileName = @"..\..\..\..\Test\DEMO\DEMO1.OBJ";
-            //mnuHelpTest_Click(null, null);
-            DoOpenFile(fileName);
-#endif
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
@@ -126,8 +117,8 @@ namespace WpfDebugger
             //MZFile mzFile = new MZFile(fileName);
             //mzFile.Relocate(0x1000); // TODO: currently we don't support loadin
             // at segment 0. We should fix this later.
-            Executable executable = new Executable(fileName);
-            ExecutableDisassembler dasm = new ExecutableDisassembler(executable);
+            var executable = new Executable(fileName);
+            var dasm = new ExecutableDisassembler(executable);
             dasm.Analyze();
 
             this.program = executable;
@@ -251,9 +242,9 @@ namespace WpfDebugger
         private void ActivateToolWindow(Control control)
         {
             if (control == null)
-                throw new ArgumentNullException("control");
+                throw new ArgumentNullException(nameof(control));
 
-            string contentId = control.Name;
+            var contentId = control.Name;
 
             LayoutAnchorable pane = dockingManager.Layout.Descendents().OfType<
                 LayoutAnchorable>().SingleOrDefault(a => a.ContentId == contentId);

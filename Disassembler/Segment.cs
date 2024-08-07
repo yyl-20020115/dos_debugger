@@ -119,7 +119,7 @@ public class SegmentCollection : IList<Segment>
     public void Add(Segment segment)
     {
         if (segment == null)
-            throw new ArgumentNullException("segment");
+            throw new ArgumentNullException(nameof(segment));
         if (segment.Id != segments.Count)
             throw new ArgumentException("The segment to add has inconsistent id.");
 

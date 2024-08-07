@@ -38,9 +38,9 @@ public class InstructionCollection(BinaryImage image)
     public void Add(Address address, Instruction instruction)
     {
         if (!image.IsAddressValid(address))
-            throw new ArgumentOutOfRangeException("address");
+            throw new ArgumentOutOfRangeException(nameof(address));
         if (instruction == null)
-            throw new ArgumentNullException("instruction");
+            throw new ArgumentNullException(nameof(instruction));
 
         this.instructions.Add(address, instruction);
     }

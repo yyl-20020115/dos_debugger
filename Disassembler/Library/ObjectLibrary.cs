@@ -12,7 +12,7 @@ public class ObjectLibrary : Assembly
     public ObjectLibrary(IEnumerable<ObjectModule> modules)
     {
         if (modules == null)
-            throw new ArgumentNullException("modules");
+            throw new ArgumentNullException(nameof(modules));
 
         foreach (ObjectModule module in modules)
             base.Modules.Add(module);
@@ -54,7 +54,7 @@ public class ObjectLibrary : Assembly
     public ObjectModule FindModule(string name)
     {
         if (name == null)
-            throw new ArgumentNullException("name");
+            throw new ArgumentNullException(nameof(name));
 
         foreach (ObjectModule module in Modules.Cast<ObjectModule>())
         {

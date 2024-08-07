@@ -21,7 +21,7 @@ public class ExecutableImage : BinaryImage
     public ExecutableImage(byte[] bytes)
     {
         if (bytes == null)
-            throw new ArgumentNullException("bytes");
+            throw new ArgumentNullException(nameof(bytes）);
         if (bytes.Length > 0x10000)
             throw new ArgumentException("Image must not exceed 64KB.");
 
@@ -37,7 +37,7 @@ public class ExecutableImage : BinaryImage
     public ExecutableImage(MZFile file)
     {
         if (file == null)
-            throw new ArgumentNullException("file");
+            throw new ArgumentNullException(nameof(file));
 
         this.bytes = file.Image;
 
