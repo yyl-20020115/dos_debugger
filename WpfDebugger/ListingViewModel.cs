@@ -62,7 +62,7 @@ public class ListingViewModel
         Address address = new Address(segmentId, segment.OffsetBounds.Begin);
         while (image.IsAddressValid(address))
         {
-            ByteAttribute b = image[address];
+            var b = image[address];
 
             while (iError < errors.Count && errors[iError].Location.Offset <= address.Offset)
             {
@@ -78,7 +78,7 @@ public class ListingViewModel
                 }
 #endif
 
-                Instruction insn = image.Instructions.Find(address);
+                var insn = image.Instructions.Find(address);
                 System.Diagnostics.Debug.Assert(insn != null);
                 rows.Add(new CodeListingRow(
                     assembly, address, insn, 
@@ -88,7 +88,7 @@ public class ListingViewModel
             }
             else if (IsLeadByteOfData(b))
             {
-                Address j = address + 1;
+                var j = address + 1;
                 while (image.IsAddressValid(j) &&
                        image[j].Type == ByteType.Data &&
                        !image[j].IsLeadByte)
@@ -240,16 +240,10 @@ public class ListingViewModel
 /// <summary>
 /// Represents a row in ASM listing.
 /// </summary>
-public abstract class ListingRow
+public abstract class ListingRow(Assembly assembly, Address location)
 {
-    readonly Assembly assembly;
-    readonly Address location;
-    
-    protected ListingRow(Assembly assembly, Address location)
-    {
-        this.assembly = assembly;
-        this.location = location;
-    }
+    readonly Assembly assembly = assembly;
+    readonly Address location = location;
 
     public Assembly Assembly => assembly;
 
@@ -267,18 +261,7 @@ public abstract class ListingRow
     /// </summary>
     public abstract byte[] Opcode { get; }
 
-    public string OpcodeText
-    {
-        get
-        {
-            if (Opcode == null)
-                return null;
-            else if (Opcode.Length <= 6)
-                return FormatBinary(Opcode, 0, Opcode.Length);
-            else
-                return FormatBinary(Opcode, 0, 6) + "...";
-        }
-    }
+    public string OpcodeText => Opcode == null ? null : Opcode.Length <= 6 ? FormatBinary(Opcode, 0, Opcode.Length) : FormatBinary(Opcode, 0, 6) + "...";
 
     /// <summary>
     /// Gets the label to display for this row, or null if there is no
@@ -290,10 +273,7 @@ public abstract class ListingRow
         {
             // Check whether we have a procedure starting at this address.
             var proc = assembly.GetImage().Procedures.Find(this.Location);
-            if (proc != null)
-                return proc.Name;
-            else
-                return null;
+            return proc != null ? proc.Name : null;
         }
     }
 
@@ -302,10 +282,7 @@ public abstract class ListingRow
     /// </summary>
     public abstract string Text { get; }
 
-    public virtual string RichText
-    {
-        get { return Text; }
-    }
+    public virtual string RichText => Text;
 
     public static string FormatBinary(byte[] data, int startIndex, int count)
     {
@@ -343,10 +320,7 @@ class BlankListingRow : ListingRow
         this.data = data;
     }
 
-    public override byte[] Opcode
-    {
-        get { return data; }
-    }
+    public override byte[] Opcode => data;
 
     public override string Text => string.Format($"{{0}} unanalyzed bytes.", data.Length);
 
