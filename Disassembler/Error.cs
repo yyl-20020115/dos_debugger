@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Disassembler;
 
 public static class AttributeUtils
 {
-    //TODO:
-    public static Attribute GetAttribute<Attribute>(this Enum attribute)
-    {
-        return default;
-    }
+    public static AttributeT GetAttribute<AttributeT>(this Enum attribute) where AttributeT : Attribute
+        => System.Attribute.GetCustomAttribute(attribute.GetType(), typeof(AttributeT)) as AttributeT;
 
 }
 /// <summary>

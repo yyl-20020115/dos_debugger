@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using X86Codec;
 
 namespace Disassembler;
@@ -15,7 +16,7 @@ public class LibraryDisassembler(ObjectLibrary library) : DisassemblerBase(libra
     protected override void GenerateProcedures()
     {
         // Enumerate the defined names, and assign names to the procedures.
-        foreach (ObjectModule module in library.Modules)
+        foreach (ObjectModule module in library.Modules.Cast<ObjectModule>())
         {
             foreach (DefinedSymbol symbol in module.DefinedNames)
             {
@@ -27,7 +28,7 @@ public class LibraryDisassembler(ObjectLibrary library) : DisassemblerBase(libra
                         var b = image[address];
                         if (b.Type == ByteType.Code && b.IsLeadByte)
                         {
-                            Procedure proc = Procedures.Find(address);
+                            var proc = Procedures.Find(address);
                             if (proc == null)
                             {
                                 proc = CreateProcedure(address);
@@ -170,8 +171,7 @@ public class LibraryDisassembler(ObjectLibrary library) : DisassemblerBase(libra
 
     protected override Address ResolveFlowInstructionTarget(PointerOperand operand)
     {
-        SymbolicTarget symbolicTarget = operand.Tag as SymbolicTarget;
-        if (symbolicTarget != null)
+        if (operand.Tag is SymbolicTarget symbolicTarget)
         {
             Address symbolicAddress = ResolveSymbolicTarget(symbolicTarget);
             return symbolicAddress;
@@ -181,7 +181,7 @@ public class LibraryDisassembler(ObjectLibrary library) : DisassemblerBase(libra
 
     public override void Analyze()
     {
-        foreach (ObjectModule module in library.Modules)
+        foreach (ObjectModule module in library.Modules.Cast<ObjectModule>())
         {
             foreach (DefinedSymbol symbol in module.DefinedNames)
             {

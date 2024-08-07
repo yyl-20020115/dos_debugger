@@ -116,10 +116,7 @@ public class UnknownComment : Comment
         this.Data = reader.ReadToEnd();
     }
 
-    public override string ToString()
-    {
-        return string.Format("Class 0x{0:X2}", CommentClass);
-    }
+    public override string ToString() => $"Class 0x{CommentClass:X2}";
 }
 
 public class TextComment : Comment
@@ -133,10 +130,7 @@ public class TextComment : Comment
         this.Value = reader.ReadToEndAsString();
     }
 
-    public override string ToString()
-    {
-        return string.Format("{0}={1}", Key, Value);
-    }
+    public override string ToString() => $"{Key}={Value}";
 }
 
 public class MemoryModelComment : Comment
@@ -175,7 +169,7 @@ public class MemoryModelComment : Comment
 
     public override string ToString()
     {
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
         if (InstructionSet != 0)
         {
             sb.Append(InstructionSet);
@@ -225,10 +219,7 @@ public class DOSSEGComment : Comment
     {
     }
 
-    public override string ToString()
-    {
-        return "DOSSEG";
-    }
+    public override string ToString() => "DOSSEG";
 }
 
 public class LinkPassSeparatorComment : Comment

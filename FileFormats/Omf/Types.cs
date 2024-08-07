@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
 
 namespace FileFormats.Omf;
 
@@ -20,10 +18,10 @@ public class SegmentDefinition
     public long Length { get; set; }
 
     public byte[] Data;
-    public List<FixupDefinition> Fixups = new List<FixupDefinition>();
+    public List<FixupDefinition> Fixups = [];
 }
 
-public enum SegmentAlignment
+public enum SegmentAlignment : int
 {
     /// <summary>The alignment is irrelevant or default.</summary>
     Absolute = 0,
@@ -85,7 +83,7 @@ public class GroupDefinition
 {
     public string Name;
     public readonly List<SegmentDefinition> Segments =
-        new List<SegmentDefinition>();
+        [];
 }
 
 public class NameDefinition

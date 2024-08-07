@@ -33,9 +33,7 @@ namespace Disassembler;
 /// </remarks>
 public abstract class Assembly
 {
-    public Assembly()
-    {
-    }
+    public Assembly() { }
 
     public ModuleCollection Modules { get; } = [];
 

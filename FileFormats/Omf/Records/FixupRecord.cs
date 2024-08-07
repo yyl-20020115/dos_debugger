@@ -99,14 +99,14 @@ class FixupRecord : Record
             if (!thread.IsDefined)
                 throw new InvalidDataException("Frame thread " + frameNumber + " is not defined.");
 
-            FixupFrame spec = new FixupFrame();
+            FixupFrame spec = new();
             spec.Method = (FixupFrameMethod)thread.Method;
             spec.IndexOrFrame = thread.IndexOrFrame;
             fixup.Frame = spec;
         }
         else
         {
-            FixupFrame spec = new FixupFrame();
+            FixupFrame spec = new();
             spec.Method = (FixupFrameMethod)((b >> 4) & 7);
             if ((int)spec.Method <= 3)
             {

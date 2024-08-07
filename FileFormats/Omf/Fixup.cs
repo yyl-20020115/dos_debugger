@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FileFormats.Omf;
 
@@ -206,26 +204,16 @@ public struct FixupFrame
     /// </summary>
     public UInt16 IndexOrFrame { get; internal set; }
 
-    public override string ToString()
+    public override readonly string ToString() => Method switch
     {
-        switch (Method)
-        {
-            case FixupFrameMethod.SegmentIndex:
-                return string.Format("SEG({0})", IndexOrFrame);
-            case FixupFrameMethod.GroupIndex:
-                return string.Format("GRP({0})", IndexOrFrame);
-            case FixupFrameMethod.ExternalIndex:
-                return string.Format("EXT({0})", IndexOrFrame);
-            case FixupFrameMethod.ExplicitFrame:
-                return string.Format("{0:X4}", IndexOrFrame);
-            case FixupFrameMethod.UseLocation:
-                return "LOCATION";
-            case FixupFrameMethod.UseTarget:
-                return "TARGET";
-            default:
-                return "(invalid)";
-        }
-    }
+        FixupFrameMethod.SegmentIndex => string.Format("SEG({0})", IndexOrFrame),
+        FixupFrameMethod.GroupIndex => string.Format("GRP({0})", IndexOrFrame),
+        FixupFrameMethod.ExternalIndex => string.Format("EXT({0})", IndexOrFrame),
+        FixupFrameMethod.ExplicitFrame => string.Format("{0:X4}", IndexOrFrame),
+        FixupFrameMethod.UseLocation => "LOCATION",
+        FixupFrameMethod.UseTarget => "TARGET",
+        _ => "(invalid)",
+    };
 }
 
 public enum FixupFrameMethod : byte

@@ -29,17 +29,11 @@ namespace Disassembler;
 /// Maintains a collection of instructions and provides methods to
 /// quickly retrieve the instruction starting at a given address.
 /// </summary>
-public class InstructionCollection
+public class InstructionCollection(BinaryImage image)
 {
-    readonly Dictionary<Address, Instruction> instructions =
-        [];
+    readonly Dictionary<Address, Instruction> instructions = [];
 
-    readonly BinaryImage image;
-
-    public InstructionCollection(BinaryImage image)
-    {
-        this.image = image ?? throw new ArgumentNullException("image");
-    }
+    readonly BinaryImage image = image ?? throw new ArgumentNullException(nameof(image));
 
     public void Add(Address address, Instruction instruction)
     {

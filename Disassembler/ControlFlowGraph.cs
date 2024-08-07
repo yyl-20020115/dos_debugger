@@ -20,7 +20,7 @@ public class ControlFlowGraph(BasicBlockCollection collection)
         System.Diagnostics.Debug.Assert(blocks.Contains(source));
         System.Diagnostics.Debug.Assert(blocks.Contains(target));
 
-        XRef xFlow = new XRef(
+        XRef xFlow = new(
             type: xref.Type,
             source: source.Location,
             target: target.Location,

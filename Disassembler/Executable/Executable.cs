@@ -1,4 +1,6 @@
-﻿namespace Disassembler;
+﻿using System;
+
+namespace Disassembler;
 
 public class Executable : Assembly
 {
@@ -10,8 +12,7 @@ public class Executable : Assembly
         var file = new MZFile(fileName);
 
         this.Image = new ExecutableImage(file);
-        this.EntryPoint =
-            new Address(Image.MapFrameToSegment(file.EntryPoint.Segment), file.EntryPoint.Offset);
+        this.EntryPoint = new (Image.MapFrameToSegment(file.EntryPoint.Segment), file.EntryPoint.Offset);
     }
 
     public override BinaryImage GetImage() => Image;
@@ -24,26 +25,15 @@ public class Executable : Assembly
 
 }
 
-#if false
-public class LoadModule : Module
+#if true
+public class LoadModule(ImageChunk image) : Module
 {
-    ImageChunk image;
-
-    public LoadModule(ImageChunk image)
-    {
-        if (image == null)
-            throw new ArgumentNullException("image");
-
-        this.image = image;
-    }
+    public readonly ImageChunk image = image ?? throw new ArgumentNullException("image");
 
     /// <summary>
     /// Gets the binary image of the load module.
     /// </summary>
-    public ImageChunk Image
-    {
-        get { return image; }
-    }
+    public ImageChunk Image => image;
 
     /// <summary>
     /// Gets or sets the initial value of SS register. This value must be

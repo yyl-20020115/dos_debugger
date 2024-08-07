@@ -86,8 +86,7 @@ public static class NameMangler
                 };
             }
 
-            int paramSize;
-            if (Int32.TryParse(s.Substring(at + 1), out paramSize)) // _f@4
+            if (int.TryParse(s.Substring(at + 1), out int paramSize)) // _f@4
             {
                 return new FunctionSignature
                 {
@@ -105,8 +104,7 @@ public static class NameMangler
             int at = s.IndexOf('@', 1);
             if (at >= 0)
             {
-                int paramSize;
-                if (Int32.TryParse(s.Substring(at + 1), out paramSize))
+                if (int.TryParse(s.Substring(at + 1), out int paramSize))
                 {
                     return new FunctionSignature
                     {

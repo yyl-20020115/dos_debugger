@@ -4,24 +4,12 @@ using System.Collections.Generic;
 
 namespace Disassembler;
 
-public class PriorityQueue<T> : Queue<T>
+public class PriorityQueue<T>(Func<T, T, int> compareByPriority) : Queue<T>
 {
-    private Func<XRef, XRef, int> compareByPriority;
+    private readonly Func<T, T, int> compareByPriority = compareByPriority;
 
-    public PriorityQueue(Func<XRef, XRef, int> compareByPriority)
-    {
-        this.compareByPriority = compareByPriority;
-    }
+    public bool IsEmpty => this.Count == 0;
 
-    public bool IsEmpty { get; internal set; }
+   
 
-    public new XRef Dequeue()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Enqueue(XRef xRef)
-    {
-        throw new NotImplementedException();
-    }
 }

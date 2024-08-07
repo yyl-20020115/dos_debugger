@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-//using Util.Data;
 
 namespace Disassembler;
 
@@ -70,10 +69,7 @@ public class XRef : IGraphEdge<Address>
     {
     }
 
-    public override string ToString()
-    {
-        return string.Format("{0} -> {1} ({2})", Source, Target, Type);
-    }
+    public override string ToString() => $"{Source} -> {Target} ({Type})";
 
     /// <summary>
     /// Compares two XRef objects by source, target, and data location,
@@ -96,8 +92,7 @@ public class XRef : IGraphEdge<Address>
     /// </summary>
     public static int CompareByPriority(XRef x, XRef y)
     {
-        int cmp = (int)x.Type - (int)y.Type;
-        return cmp;
+        return (int)x.Type - (int)y.Type;
     }
 }
 
@@ -105,7 +100,7 @@ public class XRef : IGraphEdge<Address>
 /// Defines types of cross-references. The numeric values of the enum
 /// members are in decreasing order of their priority in analysis.
 /// </summary>
-public enum XRefType
+public enum XRefType : int
 {
     /// <summary>
     /// Indicates that the XRef object is invalid.
@@ -218,31 +213,24 @@ XREF_RETURN_FROM_INTERRUPT = 6,
 // because we are much more than a collection!
 public class XRefCollection : ICollection<XRef>
 {
-    readonly Graph<Address, XRef> graph;
+    readonly Graph<Address, XRef> graph = new();
 
     /// <summary>
     /// Creates a cross reference collection.
     /// </summary>
     public XRefCollection()
     {
-        this.graph = new Graph<Address, XRef>();
     }
 
     /// <summary>
     /// Clears all the cross references stored in this collection.
     /// </summary>
-    public void Clear()
-    {
-        graph.Clear();
-    }
+    public void Clear() => graph.Clear();
 
     /// <summary>
     /// Gets the number of cross references in this collection.
     /// </summary>
-    public int Count
-    {
-        get { return graph.Edges.Count; }
-    }
+    public int Count => graph.Edges.Count;
 
     public void Add(XRef xref)
     {
@@ -270,10 +258,7 @@ public class XRefCollection : ICollection<XRef>
     /// Gets a list of xrefs with dynamic target (i.e. target == Invalid).
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<XRef> GetDynamicReferences()
-    {
-        return graph.GetIncomingEdges(Address.Invalid);
-    }
+    public IEnumerable<XRef> GetDynamicReferences() => graph.GetIncomingEdges(Address.Invalid);
 
     /// <summary>
     /// Gets all cross references that points to 'target', in the order
@@ -281,54 +266,30 @@ public class XRefCollection : ICollection<XRef>
     /// </summary>
     /// <param name="target"></param>
     /// <returns></returns>
-    public IEnumerable<XRef> GetReferencesTo(Address target)
-    {
-        return graph.GetIncomingEdges(target);
-    }
+    public IEnumerable<XRef> GetReferencesTo(Address target) => graph.GetIncomingEdges(target);
 
     /// <summary>
     /// Gets all cross references that points from 'source'.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public IEnumerable<XRef> GetReferencesFrom(Address source)
-    {
-        return graph.GetOutgoingEdges(source);
-    }
+    public IEnumerable<XRef> GetReferencesFrom(Address source) => graph.GetOutgoingEdges(source);
 
     //public event EventHandler<LogicalXRefAddedEventArgs> XRefAdded;
 
     #region ICollection Interface Implementation
 
-    public bool Contains(XRef item)
-    {
-        throw new NotSupportedException();
-    }
+    public bool Contains(XRef item) => throw new NotSupportedException();
 
-    public void CopyTo(XRef[] array, int arrayIndex)
-    {
-        graph.Edges.CopyTo(array, arrayIndex);
-    }
+    public void CopyTo(XRef[] array, int arrayIndex) => graph.Edges.CopyTo(array, arrayIndex);
 
-    public bool IsReadOnly
-    {
-        get { return false; }
-    }
+    public bool IsReadOnly => false;
 
-    public bool Remove(XRef item)
-    {
-        throw new NotSupportedException();
-    }
+    public bool Remove(XRef item) => throw new NotSupportedException();
 
-    public IEnumerator<XRef> GetEnumerator()
-    {
-        return graph.Edges.GetEnumerator();
-    }
+    public IEnumerator<XRef> GetEnumerator() => graph.Edges.GetEnumerator();
 
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 
     #endregion
 }

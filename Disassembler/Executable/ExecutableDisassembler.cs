@@ -70,9 +70,9 @@ public class ExecutableDisassembler(Executable executable)
         Segment lastSegment = null;
         foreach (Segment segment in image.Segments)
         {
-            if (lastSegment != null && segment.StartAddress < lastSegment.EndAddress)
+            if (lastSegment != null && segment.OffsetBounds.Begin < lastSegment.OffsetBounds.End)
             {
-                AddError(segment.StartAddress.ToFarPointer(segment.SegmentAddress),
+                AddError(segment.OffsetBounds.ToFarPointer(segment.SegmentAddress),
                     ErrorCategory.Error,
                     "Segment {0:X4} overlaps with segment {1:X4}.",
                     lastSegment.SegmentAddress, segment.SegmentAddress);

@@ -9,21 +9,21 @@ namespace Disassembler;
 /// </summary>
 public class MZFile
 {
+    public readonly string FileName;
 
     /// <summary>
     /// Loads a DOS MZ executable file from disk.
     /// </summary>
-    /// <param name="fileName">Name of the file to open.</param>
-    public MZFile(string fileName)
+    /// <param name="FileName">Name of the file to open.</param>
+    public MZFile(string FileName)
     {
-        if (fileName == null)
-            throw new ArgumentNullException("fileName");
+        this.FileName = FileName ?? throw new ArgumentNullException("fileName");
 
-        using var stream = new FileStream(fileName,
+        using var stream = new FileStream(this.FileName,
             FileMode.Open, FileAccess.Read, FileShare.Read);
         using var reader = new BinaryReader(stream);
         // Read file header.
-        Header = new MZHeader
+        this.Header = new MZHeader
         {
             Signature = reader.ReadUInt16(),
             LastPageSize = reader.ReadUInt16(),

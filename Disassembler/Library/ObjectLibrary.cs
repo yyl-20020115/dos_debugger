@@ -36,7 +36,7 @@ public class ObjectLibrary : Assembly
     public string Name => System.IO.Path.GetFileName(FileName);
 
     public readonly SortedDictionary<string, List<ObjectModule>> Symbols
-        = new SortedDictionary<string, List<ObjectModule>>();
+        = [];
 
     public LibraryImage Image { get; set; }
 
@@ -67,7 +67,7 @@ public class ObjectLibrary : Assembly
     public void AssignIdsToSegments()
     {
         this.Image = new LibraryImage();
-        foreach (ObjectModule module in Modules)
+        foreach (ObjectModule module in Modules.Cast<ObjectModule>())
         {
             foreach (LogicalSegment segment in module.Segments)
             {
@@ -79,10 +79,10 @@ public class ObjectLibrary : Assembly
 
     public void ResolveAllSymbols()
     {
-        Dictionary<string, DefinedSymbol> publicNames = new Dictionary<string, DefinedSymbol>();
+        Dictionary<string, DefinedSymbol> publicNames = [];
 
         // First, build a map of each public name.
-        foreach (ObjectModule module in Modules)
+        foreach (ObjectModule module in Modules.Cast<ObjectModule>())
         {
             foreach (DefinedSymbol name in module.DefinedNames)
             {

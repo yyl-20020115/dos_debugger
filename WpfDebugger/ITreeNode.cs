@@ -1,6 +1,5 @@
-﻿namespace WpfDebugger
+﻿namespace WpfDebugger;
+
+public interface ITreeNode
 {
-    internal interface ITreeNode
-    {
-    }
 }

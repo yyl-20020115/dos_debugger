@@ -58,13 +58,7 @@ public class SymbolicTarget
     /// </summary>
     public UInt32 Displacement { get; set; }
 
-    public override string ToString()
-    {
-        if (Displacement == 0)
-            return Referent.Label;
-        else
-            return string.Format("{0}+{1:X4}", Referent.Label, Displacement);
-    }
+    public override string ToString() => Displacement == 0 ? Referent.Label : string.Format("{0}+{1:X4}", Referent.Label, Displacement);
 
 #if false
     public override string ToString()
@@ -158,10 +152,7 @@ public class SymbolicMemoryOperand : MemoryOperand, IFixedSource
         this.Target = target;
     }
 
-    public SymbolicTarget GetFixedTarget()
-    {
-        return this.Target;
-    }
+    public SymbolicTarget GetFixedTarget() => this.Target;
 }
 
 #if false
@@ -187,79 +178,47 @@ public class SymbolicPointerOperand :Operand
 }
 #endif
 
-public class SourceAwareRelativeOperand : RelativeOperand
+public class SourceAwareRelativeOperand(RelativeOperand opr, Address source) : RelativeOperand(opr.Offset)
 {
-    readonly Address source;
+    readonly Address source = source;
 
-    public Address Source
-    {
-        get { return source; }
-    }
+    public Address Source => source;
 
-    public Address Target
-    {
-        get
-        {
-            return new Address(source.Segment, (UInt16)(source.Offset + base.Offset.Value));
-        }
-    }
+    public Address Target => new Address(source.Segment, (UInt16)(source.Offset + base.Offset.Value));
 
-    public SourceAwareRelativeOperand(RelativeOperand opr, Address source)
-        : base(opr.Offset)
-    {
-        this.source = source;
-    }
-
-    public override string ToString()
-    {
-        return Target.Offset.ToString("X4");
-    }
+    public override string ToString() => Target.Offset.ToString("X4");
 }
 
 public class SymbolicInstructionFormatter : InstructionFormatter
 {
-    public override string FormatOperand(Operand operand)
-    {
-        if (operand is SourceAwareRelativeOperand &&
-            operand.Tag == null)
-            return FormatOperand((SourceAwareRelativeOperand)operand);
-        else
-            return base.FormatOperand(operand);
-    }
+    public override string FormatOperand(Operand operand) 
+        => operand is SourceAwareRelativeOperand operand1 &&
+            operand.Tag == null
+            ? FormatOperand(operand1)
+            : base.FormatOperand(operand);
 
-    protected override string FormatFixableLocation(Operand operand)
+    protected override string FormatFixableLocation(Operand operand) => operand.FixableLocation.Length switch
     {
-        if (operand.FixableLocation.Length > 0 &&
-            operand.Tag is SymbolicTarget)
-        {
-            return string.Format(
-                "<a href=\"somewhere\">{0}</a>",
-                (SymbolicTarget)operand.Tag);
-        }
-        else
-        {
-            return base.FormatFixableLocation(operand);
-        }
-    }
+        > 0 when operand.Tag is SymbolicTarget target => string.Format(
+            "<a href=\"somewhere\">{0}</a>",
+            target),
+        _ => base.FormatFixableLocation(operand)
+    };
 
-    public virtual string FormatOperand(SourceAwareRelativeOperand operand)
-    {
-        return string.Format("<a href=\"somewhere\">{0:X4}</a>", operand.Target.Offset);
-    }
+    public virtual string FormatOperand(SourceAwareRelativeOperand operand) => $"<a href=\"somewhere\">{operand.Target.Offset:X4}</a>";
 
     public override string FormatInstruction(Instruction instruction)
     {
         string s = base.FormatInstruction(instruction);
 
         // Make "interesting" instructions bold.
-        switch (instruction.Operation)
+        return instruction.Operation switch
         {
             //case Operation.CALL:
             //case Operation.CALLF:
             //    return string.Format("<b>{0}</b>", s);
-            default:
-                return s;
-        }
+            _ => s,
+        };
     }
 
     public override string FormatMnemonic(Operation operation)

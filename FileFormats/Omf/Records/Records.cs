@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.ComponentModel;
 using System.IO;
-//using Util.Data;
 
 namespace FileFormats.Omf.Records;
 
@@ -173,84 +171,31 @@ public abstract class Record
                 expectedRecord, reader.RecordNumber));
         }
 
-        Record r;
-        switch (reader.RecordNumber)
+        Record r = reader.RecordNumber switch
         {
-            case RecordNumber.LibraryHeader:
-                r = new LibraryHeaderRecord(reader, context);
-                break;
-            case RecordNumber.LibraryEnd:
-                r = new LibraryEndRecord(reader, context);
-                break;
-            case RecordNumber.ALIAS:
-                r = new ALIASRecord(reader, context);
-                break;
-            case RecordNumber.CEXTDEF:
-                r = new CEXTDEFRecord(reader, context);
-                break;
-            case RecordNumber.COMDAT:
-            case RecordNumber.COMDAT32:
-                r = new COMDATRecord(reader, context);
-                break;
-            case RecordNumber.COMDEF:
-                r = new COMDEFRecord(reader, context);
-                break;
-            case RecordNumber.COMENT:
-                r = new CommentRecord(reader, context);
-                break;
-            case RecordNumber.EXTDEF:
-                r = new EXTDEFRecord(reader, context);
-                break;
-            case RecordNumber.FIXUPP:
-            case RecordNumber.FIXUPP32:
-                r = new FixupRecord(reader, context);
-                break;
-            case RecordNumber.GRPDEF:
-                r = new GRPDEFRecord(reader, context);
-                break;
-            case RecordNumber.LCOMDEF:
-                r = new LCOMDEFRecord(reader, context);
-                break;
-            case RecordNumber.LEDATA:
-            case RecordNumber.LEDATA32:
-                r = new LEDATARecord(reader, context);
-                break;
-            case RecordNumber.LEXTDEF:
-            case RecordNumber.LEXTDEF32:
-                r = new LEXTDEFRecord(reader, context);
-                break;
-            case RecordNumber.LHEADR:
-                r = new LHEADRRecord(reader, context);
-                break;
-            case RecordNumber.LIDATA:
-            case RecordNumber.LIDATA32:
-                r = new LIDATARecord(reader, context);
-                break;
-            case RecordNumber.LNAMES:
-                r = new ListOfNamesRecord(reader, context);
-                break;
-            case RecordNumber.LPUBDEF:
-            case RecordNumber.LPUBDEF32:
-                r = new LPUBDEFRecord(reader, context);
-                break;
-            case RecordNumber.MODEND:
-                r = new MODENDRecord(reader, context);
-                break;
-            case RecordNumber.PUBDEF:
-            case RecordNumber.PUBDEF32:
-                r = new PUBDEFRecord(reader, context);
-                break;
-            case RecordNumber.SEGDEF:
-            case RecordNumber.SEGDEF32:
-                r = new SEGDEFRecord(reader, context);
-                break;
-            case RecordNumber.THEADR:
-                r = new THEADRRecord(reader, context);
-                break;
-            default:
-                r = new UnknownRecord(reader, context);
-                break;
-        }
+            RecordNumber.LibraryHeader => new LibraryHeaderRecord(reader, context),
+            RecordNumber.LibraryEnd => new LibraryEndRecord(reader, context),
+            RecordNumber.ALIAS => new ALIASRecord(reader, context),
+            RecordNumber.CEXTDEF => new CEXTDEFRecord(reader, context),
+            RecordNumber.COMDAT or RecordNumber.COMDAT32 => new COMDATRecord(reader, context),
+            RecordNumber.COMDEF => new COMDEFRecord(reader, context),
+            RecordNumber.COMENT => new CommentRecord(reader, context),
+            RecordNumber.EXTDEF => new EXTDEFRecord(reader, context),
+            RecordNumber.FIXUPP or RecordNumber.FIXUPP32 => new FixupRecord(reader, context),
+            RecordNumber.GRPDEF => new GRPDEFRecord(reader, context),
+            RecordNumber.LCOMDEF => new LCOMDEFRecord(reader, context),
+            RecordNumber.LEDATA or RecordNumber.LEDATA32 => new LEDATARecord(reader, context),
+            RecordNumber.LEXTDEF or RecordNumber.LEXTDEF32 => new LEXTDEFRecord(reader, context),
+            RecordNumber.LHEADR => new LHEADRRecord(reader, context),
+            RecordNumber.LIDATA or RecordNumber.LIDATA32 => new LIDATARecord(reader, context),
+            RecordNumber.LNAMES => new ListOfNamesRecord(reader, context),
+            RecordNumber.LPUBDEF or RecordNumber.LPUBDEF32 => new LPUBDEFRecord(reader, context),
+            RecordNumber.MODEND => new MODENDRecord(reader, context),
+            RecordNumber.PUBDEF or RecordNumber.PUBDEF32 => new PUBDEFRecord(reader, context),
+            RecordNumber.SEGDEF or RecordNumber.SEGDEF32 => new SEGDEFRecord(reader, context),
+            RecordNumber.THEADR => new THEADRRecord(reader, context),
+            _ => new UnknownRecord(reader, context),
+        };
 
         // TODO: check all bytes are consumed.
         // ...
@@ -265,10 +210,7 @@ public abstract class Record
         return r;
     }
 
-    public override string ToString()
-    {
-        return string.Format("{0} @ {1:X}", RecordNumber, Position);
-    }
+    public override string ToString() => $"{RecordNumber} @ {Position:X}";
 }
 
 /// <summary>
@@ -284,40 +226,21 @@ class UnknownRecord : Record
         this.Data = reader.Data;
     }
 
-    public override string ToString()
-    {
-        return string.Format("? {0} @ {1:X}", RecordNumber, Position);
-    }
+    public override string ToString() => $"? {RecordNumber} @ {Position:X}";
 }
 
-class LibraryHeaderRecord : Record
+class LibraryHeaderRecord(RecordReader reader, RecordContext context) : Record(reader, context)
 {
     /// <summary>
     /// Gets the size, in bytes, of a page in the library file. Each
     /// object module in the library file must be aligned on page
     /// boundary.
     /// </summary>
-    public int PageSize { get; private set; }
-
-    public LibraryHeaderRecord(RecordReader reader, RecordContext context)
-        : base(reader, context)
-    {
-        this.PageSize = reader.Data.Length + 4;
-
-        // Record data consists of 7 bytes of dictionary information
-        // (which we ignore), followed by padding bytes to make the next
-        // record (which should be THEADR) aligned on page boundary.
-    }
+    public int PageSize { get; private set; } = reader.Data.Length + 4;
 }
 
-class LibraryEndRecord : Record
+class LibraryEndRecord(RecordReader reader, RecordContext context) : Record(reader, context)
 {
-    public LibraryEndRecord(RecordReader reader, RecordContext context)
-        : base(reader, context)
-    {
-        // Record data serves as padding to align the dictionary that
-        // follows at 512-byte boundary.
-    }
 }
 
 /// <summary>
@@ -525,12 +448,8 @@ class PUBDEFRecord : Record
     }
 }
 
-class LPUBDEFRecord : PUBDEFRecord
+class LPUBDEFRecord(RecordReader reader, RecordContext context) : PUBDEFRecord(reader, context)
 {
-    public LPUBDEFRecord(RecordReader reader, RecordContext context)
-        : base(reader, context)
-    {
-    }
 }
 
 /// <summary>

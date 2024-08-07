@@ -61,7 +61,7 @@ public abstract class DisassemblerBase(BinaryImage image)
         // of analysis, we push the target addresses to the queue of
         // entry points to be analyzed later.
         PriorityQueue<XRef> xrefQueue =
-            new PriorityQueue<XRef>(XRef.CompareByPriority);
+            new(XRef.CompareByPriority);
 
         // Maintain a list of all procedure calls (with known target)
         // encountered during the analysis. After we finish analyzing
@@ -123,15 +123,9 @@ public abstract class DisassemblerBase(BinaryImage image)
         }
     }
 
-    private BasicBlock AnalyzeBasicBlock(XRef entry, PriorityQueue<XRef> xrefQueue)
-    {
-        throw new NotImplementedException();
-    }
+    private BasicBlock AnalyzeBasicBlock(XRef entry, PriorityQueue<XRef> xrefQueue) => throw new NotImplementedException();
 
-    private XRef ProcessJumpTableEntry(XRef entry, PriorityQueue<XRef> xrefQueue)
-    {
-        throw new NotImplementedException();
-    }
+    private XRef ProcessJumpTableEntry(XRef entry, PriorityQueue<XRef> xrefQueue) => throw new NotImplementedException();
 
     /// <summary>
     /// Generates control flow graph from existing xrefs.
@@ -331,7 +325,7 @@ public abstract class DisassemblerBase(BinaryImage image)
         if (block == null)
             return false;
 
-        Stack<BasicBlock> queue = new Stack<BasicBlock>();
+        Stack<BasicBlock> queue = new();
         queue.Push(block);
 
         while (queue.Count > 0)

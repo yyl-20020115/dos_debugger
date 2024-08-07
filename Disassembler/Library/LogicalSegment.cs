@@ -20,11 +20,11 @@ namespace Disassembler;
 [TypeConverter(typeof(ExpandableObjectConverter))]
 public class LogicalSegment : IAddressReferent
 {
-    private SegmentDefinition definition;
+    private readonly SegmentDefinition definition;
 
-    readonly string fullName;
-    readonly byte[] data;
-    readonly FixupCollection fixups = [];
+    private readonly string fullName;
+    private readonly byte[] data;
+    private readonly FixupCollection fixups = [];
 
     internal LogicalSegment(
         SegmentDefinition def,
@@ -80,9 +80,9 @@ public class LogicalSegment : IAddressReferent
     public FixupCollection Fixups => fixups;
 
     public override string ToString() 
-        => string.Format("{0}:{1}", fullName, Class);
+        => $"{fullName}:{Class}";
 
     string IAddressReferent.Label => fullName;
 
-    Address IAddressReferent.Resolve() => new Address(Id, 0);
+    Address IAddressReferent.Resolve() => new (Id, 0);
 }

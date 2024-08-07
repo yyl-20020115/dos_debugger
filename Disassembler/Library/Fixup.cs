@@ -11,13 +11,13 @@ namespace Disassembler;
 /// bytes in a binary image.
 /// </summary>
 [TypeConverter(typeof(ExpandableObjectConverter))]
-public class Fixup
+public class Fixup(int offset = 0)
 {
     /// <summary>
     /// Gets or sets the start index to apply the fix-up, relative to the
     /// beginning of an image.
     /// </summary>
-    public int StartIndex { get; internal set; }
+    public int StartIndex { get; internal set; } = offset;
 
     public int EndIndex => StartIndex + Length;
 
@@ -109,9 +109,7 @@ public class FixupCollection : IList<Fixup>
 {
     readonly List<Fixup> fixups = [];
 
-    public FixupCollection()
-    {
-    }
+    public FixupCollection() { }
 
     /// <summary>
     /// Gets or sets the name for this fixup collection.
@@ -127,41 +125,30 @@ public class FixupCollection : IList<Fixup>
     /// <returns></returns>
     public int BinarySearch(int offset)
     {
-        //TODO:
-        int k = 0;// fixups.BinarySearch(offset, CompareFixupWithOffset);
+        // fixups.BinarySearch(offset, CompareFixupWithOffset);
+        var k = fixups.BinarySearch(new Fixup(offset), new FixupComparer());
         while (k > 0 && CompareFixupWithOffset(fixups[k - 1], offset) == 0)
             k--;
         return k;
     }
-    private static int CompareFixupWithOffset(Fixup fixup, int offset)
+    private class FixupComparer : IComparer<Fixup>
     {
-        if (fixup.StartIndex > offset)
-            return 1;
-        else if (fixup.EndIndex > offset)
-            return 0;
-        else
-            return -1;
+        public int Compare(Fixup x, Fixup y)
+            => x.StartIndex > y.StartIndex ? 1 : x.EndIndex > y.StartIndex ? 0 : -1;
     }
+    private static int CompareFixupWithOffset(Fixup fixup, int offset) 
+        => fixup.StartIndex > offset ? 1 : fixup.EndIndex > offset ? 0 : -1;
 
-    public int IndexOf(Fixup item)
-    {
-        throw new NotSupportedException();
-    }
+    public int IndexOf(Fixup item) => throw new NotSupportedException();
 
-    public void Insert(int index, Fixup item)
-    {
-        throw new NotSupportedException();
-    }
+    public void Insert(int index, Fixup item) => throw new NotSupportedException();
 
-    public void RemoveAt(int index)
-    {
-        throw new NotSupportedException();
-    }
+    public void RemoveAt(int index) => throw new NotSupportedException();
 
     public Fixup this[int index]
     {
-        get { return fixups[index]; }
-        set { throw new NotSupportedException(); }
+        get => fixups[index];
+        set => throw new NotSupportedException();
     }
 
     public void Add(Fixup fixup)
@@ -197,37 +184,19 @@ public class FixupCollection : IList<Fixup>
             existing, newone, this.Name));
     }
 
-    public void Clear()
-    {
-        throw new NotSupportedException();
-    }
+    public void Clear() => throw new NotSupportedException();
 
-    public bool Contains(Fixup item)
-    {
-        throw new NotSupportedException();
-    }
+    public bool Contains(Fixup item) => throw new NotSupportedException();
 
-    public void CopyTo(Fixup[] array, int arrayIndex)
-    {
-        fixups.CopyTo(array, arrayIndex);
-    }
+    public void CopyTo(Fixup[] array, int arrayIndex) => fixups.CopyTo(array, arrayIndex);
 
     public int Count => fixups.Count;
 
     public bool IsReadOnly => false;
 
-    public bool Remove(Fixup item)
-    {
-        throw new NotSupportedException();
-    }
+    public bool Remove(Fixup item) => throw new NotSupportedException();
 
-    public IEnumerator<Fixup> GetEnumerator()
-    {
-        return fixups.GetEnumerator();
-    }
+    public IEnumerator<Fixup> GetEnumerator() => fixups.GetEnumerator();
 
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 }

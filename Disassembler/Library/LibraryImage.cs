@@ -4,14 +4,9 @@ namespace Disassembler;
 
 public class LibraryImage : BinaryImage
 {
-    public LibraryImage()
-    {
-    }
+    public LibraryImage() { }
 
-    public LibrarySegment GetSegment(int index)
-    {
-        return (LibrarySegment)Segments[index];
-    }
+    public LibrarySegment GetSegment(int index) => (LibrarySegment)Segments[index];
 
     public override ArraySegment<byte> GetBytes(Address address, int count)
     {
@@ -24,25 +19,16 @@ public class LibraryImage : BinaryImage
     
     public override string FormatAddress(Address address)
     {
-        if (address.Segment < 0 || address.Segment >= Segments.Count)
-            throw new ArgumentOutOfRangeException("address");
-
-        return string.Format("{0}+{1:X4}",
-            Segments[address.Segment].Name,
-            address.Offset);
+        return address.Segment < 0 || address.Segment >= Segments.Count
+            ? throw new ArgumentOutOfRangeException("address")
+            : $"{Segments[address.Segment].Name}+{address.Offset:X4}";
     }
 }
 
-public class LibrarySegment : Segment
+public class LibrarySegment(LogicalSegment segment) : Segment
 {
-    readonly LogicalSegment segment;
-    readonly ByteAttribute[] attrs;
-
-    public LibrarySegment(LogicalSegment segment)
-    {
-        this.segment = segment;
-        this.attrs = new ByteAttribute[segment.Data.Length];
-    }
+    readonly LogicalSegment segment = segment;
+    readonly ByteAttribute[] attrs = new ByteAttribute[segment.Data.Length];
 
     public LogicalSegment Segment => segment;
 

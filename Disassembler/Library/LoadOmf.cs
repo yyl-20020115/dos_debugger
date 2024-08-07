@@ -73,8 +73,7 @@ public static class OmfLoader
     {
         var module = new ObjectModule();
 
-        Dictionary<object, object> objectMap =
-            [];
+        Dictionary<object, object> objectMap = [];
 
         // Convert meta-data.
         module.Name = context.ObjectName;
@@ -149,37 +148,19 @@ public static class OmfLoader
     private static Fixup ConvertFixupDefinition(
         FixupDefinition def, Dictionary<object, object> objectMap)
     {
-        Fixup fixup = new Fixup();
+        Fixup fixup = new();
         fixup.StartIndex = def.DataOffset;
-        switch (def.Location)
+        fixup.LocationType = def.Location switch
         {
-            case FixupLocation.LowByte:
-                fixup.LocationType = FixupLocationType.LowByte;
-                break;
-            case FixupLocation.Offset:
-            case FixupLocation.LoaderResolvedOffset:
-                fixup.LocationType = FixupLocationType.Offset;
-                break;
-            case FixupLocation.Base:
-                fixup.LocationType = FixupLocationType.Base;
-                break;
-            case FixupLocation.Pointer:
-                fixup.LocationType = FixupLocationType.Pointer;
-                break;
-            default:
-                throw new InvalidDataException("The fixup location is not supported.");
-        }
+            FixupLocation.LowByte => FixupLocationType.LowByte,
+            FixupLocation.Offset or FixupLocation.LoaderResolvedOffset => FixupLocationType.Offset,
+            FixupLocation.Base => FixupLocationType.Base,
+            FixupLocation.Pointer => FixupLocationType.Pointer,
+            _ => throw new InvalidDataException("The fixup location is not supported."),
+        };
         fixup.Mode = def.Mode;
 
-        IAddressReferent referent;
-        if (def.Target.Referent is UInt16)
-        {
-            referent = new PhysicalAddress((UInt16)def.Target.Referent, 0);
-        }
-        else
-        {
-            referent = (IAddressReferent)objectMap[def.Target.Referent];
-        }
+        IAddressReferent referent = def.Target.Referent is UInt16 v ? new PhysicalAddress(v, 0) : (IAddressReferent)objectMap[def.Target.Referent];
         fixup.Target = new SymbolicTarget
         {
             Referent = (IAddressReferent)referent,
@@ -192,9 +173,11 @@ public static class OmfLoader
     private static SegmentGroup ConvertGroupDefinition(
         GroupDefinition def, Dictionary<object, object> objectMap)
     {
-        SegmentGroup group = new SegmentGroup();
-        group.Name = def.Name;
-        group.Segments = new LogicalSegment[def.Segments.Count];
+        SegmentGroup group = new()
+        {
+            Name = def.Name,
+            Segments = new LogicalSegment[def.Segments.Count]
+        };
         for (int i = 0; i < group.Segments.Length; i++)
         {
             group.Segments[i] = (LogicalSegment)objectMap[def.Segments[i]];

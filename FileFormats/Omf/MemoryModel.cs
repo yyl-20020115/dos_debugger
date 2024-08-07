@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Disassembler;
 
-namespace Disassembler;
-
-public enum MemoryModel
+public enum MemoryModel :int
 {
     Unknown = 0,
     Tiny,

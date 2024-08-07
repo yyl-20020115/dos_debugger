@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
@@ -33,24 +32,11 @@ public class RecordReader
         this.Checksum = reader.ReadByte();
     }
 
-    public bool IsEOF
-    {
-        get { return index == Data.Length; }
-    }
+    public bool IsEOF => index == Data.Length;
 
-    public byte PeekByte()
-    {
-        if (index >= Data.Length)
-            throw new InvalidDataException();
-        return Data[index];
-    }
+    public byte PeekByte() => index >= Data.Length ? throw new InvalidDataException() : Data[index];
 
-    public byte ReadByte()
-    {
-        if (index >= Data.Length)
-            throw new InvalidDataException();
-        return Data[index++];
-    }
+    public byte ReadByte() => index >= Data.Length ? throw new InvalidDataException() : Data[index++];
 
     public byte[] ReadToEnd()
     {
@@ -102,13 +88,7 @@ public class RecordReader
     /// record number is odd.
     /// </summary>
     /// <returns></returns>
-    public UInt32 ReadUInt16Or32()
-    {
-        if (((int)RecordNumber & 1) == 0)
-            return ReadUInt16();
-        else
-            return ReadUInt32();
-    }
+    public UInt32 ReadUInt16Or32() => ((int)RecordNumber & 1) == 0 ? ReadUInt16() : ReadUInt32();
 
     /// <summary>
     /// Reads a string encoded as an 8-bit unsigned 'count' followed by

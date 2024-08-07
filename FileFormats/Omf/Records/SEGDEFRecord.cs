@@ -10,7 +10,7 @@ public class SEGDEFRecord : Record
     public SEGDEFRecord(RecordReader reader, RecordContext context)
         : base(reader, context)
     {
-        SegmentDefinition def = new SegmentDefinition();
+        SegmentDefinition def = new();
 
         // Read the record.
         byte acbp = reader.ReadByte();
@@ -52,56 +52,36 @@ public class SEGDEFRecord : Record
         context.Segments.Add(def);
     }
 
-    private static bool GetUse32(byte acbp)
-    {
-        return (acbp & 0x01) != 0;
-    }
+    private static bool GetUse32(byte acbp) => (acbp & 0x01) != 0;
 
     private static SegmentAlignment GetAlignment(byte acbp)
     {
         int alignment = acbp >> 5;
-        switch (alignment)
+        return alignment switch
         {
-            case 0: return SegmentAlignment.Absolute;
-            case 1: return SegmentAlignment.Byte;
-            case 2: return SegmentAlignment.Word;
-            case 3: return SegmentAlignment.Paragraph;
-            case 4: return SegmentAlignment.Page;
-            case 5: return SegmentAlignment.DWord;
-            default:
-                throw new InvalidDataException("Unsupported segment alignment: " + alignment);
-        }
+            0 => SegmentAlignment.Absolute,
+            1 => SegmentAlignment.Byte,
+            2 => SegmentAlignment.Word,
+            3 => SegmentAlignment.Paragraph,
+            4 => SegmentAlignment.Page,
+            5 => SegmentAlignment.DWord,
+            _ => throw new InvalidDataException("Unsupported segment alignment: " + alignment),
+        };
     }
 
     private static SegmentCombination GetCombination(byte acbp)
     {
         int combination = (acbp >> 2) & 7;
-        switch (combination)
+        return combination switch
         {
-            case 0: return SegmentCombination.Private;
-            case 2:
-            case 4:
-            case 7: return SegmentCombination.Public;
-            case 5: return SegmentCombination.Stack;
-            case 6: return SegmentCombination.Common;
-            default:
-                throw new InvalidDataException("Unsupported segment combination: " + combination);
-        }
+            0 => SegmentCombination.Private,
+            2 or 4 or 7 => SegmentCombination.Public,
+            5 => SegmentCombination.Stack,
+            6 => SegmentCombination.Common,
+            _ => throw new InvalidDataException("Unsupported segment combination: " + combination),
+        };
     }
 
-    private static long GetLength(byte acbp, UInt32 storedLength, RecordNumber recordNumber)
-    {
-        bool isBig = (acbp & 0x02) != 0;
-        if (isBig)
-        {
-            if (recordNumber == RecordNumber.SEGDEF32)
-                return 0x100000000L;
-            else
-                return 0x10000;
-        }
-        else
-        {
-            return storedLength;
-        }
-    }
+    private static long GetLength(byte acbp, UInt32 storedLength, RecordNumber recordNumber) 
+        => (acbp & 0x02) != 0 ? recordNumber == RecordNumber.SEGDEF32 ? 0x100000000L : 0x10000 : storedLength;
 }

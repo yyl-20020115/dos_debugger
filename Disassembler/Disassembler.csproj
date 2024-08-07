@@ -91,6 +91,7 @@
     <Compile Include="Executable\Executable.cs" />
     <Compile Include="Executable\ExecutableDisassembler.cs" />
     <Compile Include="Executable\ExecutableImage.cs" />
+    <Compile Include="Executable\ImageChunk.cs" />
     <Compile Include="Executable\MZLoader.cs" />
     <Compile Include="FunctionSignature.cs" />
     <Compile Include="Graph.cs" />

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using FileFormats.Omf.Records;
 
@@ -18,13 +17,11 @@ public static class OmfLoader
         if (fileName == null)
             throw new ArgumentNullException("fileName");
 
-        using (Stream stream = File.OpenRead(fileName))
-        using (BinaryReader reader = new BinaryReader(stream))
-        {
-            List<Records.RecordContext> modules =
-                new List<RecordContext>(LoadLibrary(reader));
-            return modules;
-        }
+        using Stream stream = File.OpenRead(fileName);
+        using BinaryReader reader = new(stream);
+        List<Records.RecordContext> modules =
+            new(LoadLibrary(reader));
+        return modules;
     }
 
     /// <summary>
@@ -71,8 +68,8 @@ public static class OmfLoader
     /// </returns>
     public static RecordContext LoadObject(BinaryReader reader)
     {
-        List<Record> records = new List<Record>();
-        RecordContext context = new RecordContext();
+        List<Record> records = [];
+        RecordContext context = new();
 
         while (true)
         {
@@ -89,7 +86,7 @@ public static class OmfLoader
                 return null;
             }
         }
-        context.Records = records.ToArray();
+        context.Records = [.. records];
         return context;
     }
 }

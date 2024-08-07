@@ -232,9 +232,9 @@ public struct Address(int segment, int offset) : IComparable<Address>
 
     public static bool operator !=(Address a, Address b) => !(a == b);
 
-    public override bool Equals(object obj) => (obj is Address address) && (this == address);
+    public override readonly bool Equals(object obj) => (obj is Address address) && (this == address);
 
-    public override int GetHashCode() => (Segment << 16) | Offset;
+    public override readonly int GetHashCode() => (Segment << 16) | Offset;
 
     /// <summary>
     /// Represents an invalid (null) address.
@@ -248,7 +248,7 @@ public struct Address(int segment, int offset) : IComparable<Address>
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public int CompareTo(Address other)
+    public readonly int CompareTo(Address other)
     {
         var cmp = this.Segment.CompareTo(other.Segment);
         if (cmp == 0)
@@ -271,7 +271,7 @@ public struct Address(int segment, int offset) : IComparable<Address>
         => new (address.Segment, address.Offset - decrement);
 
     public override readonly string ToString() 
-        => this == Invalid ? "(Invalid)" : string.Format("seg{0:0000}:{1:X4}", Segment, Offset);
+        => this == Invalid ? "(Invalid)" : $"seg{Segment:0000}:{Offset:X4}";
 }
 
 public struct PhysicalAddress : IAddressReferent
@@ -288,10 +288,7 @@ public struct PhysicalAddress : IAddressReferent
 
     readonly string IAddressReferent.Label => string.Format("X4:X4", Frame, Offset);
 
-    public Address Resolve()
-    {
-        throw new NotSupportedException();
-    }
+    public Address Resolve() => throw new NotSupportedException();
 }
 
 #if false

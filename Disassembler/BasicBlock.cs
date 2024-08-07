@@ -73,7 +73,7 @@ public class BasicBlock
 /// <summary>
 /// Specifies the type of a basic block.
 /// </summary>
-public enum BasicBlockType
+public enum BasicBlockType : int
 {
     Unknown = 0,
 
@@ -136,18 +136,17 @@ public class BasicBlockCollection : ICollection<BasicBlock>
     // better to use SortedDictionary for better insertion, but
     // unfortunately that one doesn't support binary search, so
     // there is no way to quickly find a block that covers a byte.
-    readonly List<SortedList<int, int>> map = 
-        new List<SortedList<int, int>>();
+    readonly List<SortedList<int, int>> map = [];
 
     // Keep a list of blocks so that we don't have to implement
     // IEnumerable ourselves. Strictly speaking this is redundant.
-    readonly List<BasicBlock> blocks = new List<BasicBlock>();
+    readonly List<BasicBlock> blocks = [];
 
     readonly ControlFlowGraph controlFlowGraph;
 
     public BasicBlockCollection()
     {
-        controlFlowGraph = new ControlFlowGraph(this);
+        this.controlFlowGraph = new ControlFlowGraph(this);
     }
 
     public bool Contains(BasicBlock item)
@@ -156,14 +155,7 @@ public class BasicBlockCollection : ICollection<BasicBlock>
             return false;
 
         int segment = item.Location.Segment;
-        if (segment < 0 || segment >= map.Count)
-            return false;
-
-        int index;
-        if (!map[segment].TryGetValue(item.Location.Offset, out index))
-            return false;
-
-        return (blocks[index] == item);
+        return segment >= 0 && segment < map.Count && (map[segment].TryGetValue(item.Location.Offset, out int index) && blocks[index] == item);
     }
 
     public void Add(BasicBlock block)
@@ -246,7 +238,7 @@ public class BasicBlockCollection : ICollection<BasicBlock>
         map[segment].Add(block2.Location.Offset, blocks.Count - 1);
 
         // Return the two basic blocks.
-        return new BasicBlock[2] { block1, block2 };
+        return [block1, block2];
     }
 
     #region ICollection Interface Implementation
@@ -257,35 +249,17 @@ public class BasicBlockCollection : ICollection<BasicBlock>
         map.Clear();
     }
 
-    public void CopyTo(BasicBlock[] array, int arrayIndex)
-    {
-        blocks.CopyTo(array, arrayIndex);
-    }
+    public void CopyTo(BasicBlock[] array, int arrayIndex) => blocks.CopyTo(array, arrayIndex);
 
-    public int Count
-    {
-        get { return blocks.Count; }
-    }
+    public int Count => blocks.Count;
 
-    public bool IsReadOnly
-    {
-        get { return false; }
-    }
+    public bool IsReadOnly => false;
 
-    public bool Remove(BasicBlock item)
-    {
-        throw new NotImplementedException();
-    }
+    public bool Remove(BasicBlock item) => throw new NotImplementedException();
 
-    public IEnumerator<BasicBlock> GetEnumerator()
-    {
-        return blocks.GetEnumerator();
-    }
+    public IEnumerator<BasicBlock> GetEnumerator() => blocks.GetEnumerator();
 
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 
     #endregion
 

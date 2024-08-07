@@ -28,54 +28,34 @@ namespace Disassembler;
 /// point address. If the same entry point is called with different
 /// logical addresses, they are stored in Aliases.
 /// </summary>
-public class Procedure
+/// <remarks>
+/// Creates a procedure with the given entry point.
+/// </remarks>
+/// <param name="entryPoint">Entry point of the procedure.</param>
+public class Procedure(Address entryPoint)
 {
-    readonly Address entryPoint;
-    readonly Dictionary<BasicBlock, BasicBlock> basicBlocks =
-        [];
-
-    private CodeFeatures features = CodeFeatures.None;
-    private string name; // TODO: add Names property to store aliases
-
-    /// <summary>
-    /// Creates a procedure with the given entry point.
-    /// </summary>
-    /// <param name="entryPoint">Entry point of the procedure.</param>
-    public Procedure(Address entryPoint)
-    {
-        this.entryPoint = entryPoint;
-    }
+    readonly Dictionary<BasicBlock, BasicBlock> basicBlocks = [];
 
     /// <summary>
     /// Gets or sets the name of the procedure. Though not required, this
     /// name should be unique within the assembly, otherwise it may cause
     /// confusion to the user.
     /// </summary>
-    public string Name
-    {
-        get { return this.name; }
-        set { this.name = value; }
-    }
+    public string Name { get; set; }
 
     public ReturnType ReturnType { get; set; } // RETN/RETF/IRET
 
     /// <summary>
     /// Gets the entry point address of the procedure.
     /// </summary>
-    public Address EntryPoint
-    {
-        get { return this.entryPoint; }
-    }
-    
-    public ICollection<BasicBlock> BasicBlocks
-    {
-        get { return basicBlocks.Keys; }
-    }
+    public Address EntryPoint { get; } = entryPoint;
+
+    public ICollection<BasicBlock> BasicBlocks => basicBlocks.Keys;
 
     public void AddBasicBlock(BasicBlock block)
     {
         basicBlocks.Add(block, block);
-        this.features |= block.Features;
+        this.Features |= block.Features;
     }
 
     /// <summary>
@@ -95,10 +75,7 @@ public class Procedure
         }
     }
 
-    public CodeFeatures Features
-    {
-        get { return features; }
-    }
+    public CodeFeatures Features { get; private set; } = CodeFeatures.None;
 
     /// <summary>
     /// Adds a basic block to the procedure.
@@ -140,7 +117,7 @@ public class ProcedureEntryPointComparer : IComparer<Procedure>
 /// Specifies whether a function call is a near call or far call.
 /// </summary>
 // TODO: merge this with FunctionSignature.
-public enum CallType
+public enum CallType : int
 {
     Unknown = 0,
 
@@ -158,7 +135,7 @@ public enum CallType
 /// the enum as Flags.
 /// </summary>
 [Flags]
-public enum ReturnType
+public enum ReturnType : int
 {
     /// <summary>
     /// Indicates that the procedure never returns. Possible causes are:
@@ -198,13 +175,11 @@ public class ProcedureCollection : ICollection<Procedure>
     /// the corresponding Procedure object.
     /// </summary>
     readonly Dictionary<Address, Procedure> procMap
-        = new Dictionary<Address, Procedure>();
-
-    readonly CallGraph callGraph;
+        = [];
 
     public ProcedureCollection()
     {
-        this.callGraph = new CallGraph(this);
+        this.CallGraph = new CallGraph(this);
     }
 
     /// <summary>
@@ -213,14 +188,7 @@ public class ProcedureCollection : ICollection<Procedure>
     /// <param name="entryPoint"></param>
     /// <returns>A Procedure object with the given entry point if found,
     /// or null otherwise.</returns>
-    public Procedure Find(Address entryPoint)
-    {
-        Procedure proc;
-        if (procMap.TryGetValue(entryPoint, out proc))
-            return proc;
-        else
-            return null;
-    }
+    public Procedure Find(Address entryPoint) => procMap.TryGetValue(entryPoint, out Procedure proc) ? proc : null;
 
     #region ICollection implementation
 
@@ -237,53 +205,23 @@ public class ProcedureCollection : ICollection<Procedure>
         procMap.Add(procedure.EntryPoint, procedure);
     }
 
-    public void Clear()
-    {
-        throw new NotImplementedException();
-    }
+    public void Clear() => throw new NotImplementedException();
 
-    public bool Contains(Procedure item)
-    {
-        if (item == null)
-            return false;
-        else
-            return Find(item.EntryPoint) == item;
-    }
+    public bool Contains(Procedure item) => item != null && Find(item.EntryPoint) == item;
 
-    public void CopyTo(Procedure[] array, int arrayIndex)
-    {
-        this.procMap.Values.CopyTo(array, arrayIndex);
-    }
+    public void CopyTo(Procedure[] array, int arrayIndex) => this.procMap.Values.CopyTo(array, arrayIndex);
 
-    public int Count
-    {
-        get { return procMap.Count; }
-    }
+    public int Count => procMap.Count;
 
-    public bool IsReadOnly
-    {
-        get { return false; }
-    }
+    public bool IsReadOnly => false;
 
-    public bool Remove(Procedure item)
-    {
-        throw new NotImplementedException();
-    }
+    public bool Remove(Procedure item) => throw new NotImplementedException();
 
-    public IEnumerator<Procedure> GetEnumerator()
-    {
-        return procMap.Values.GetEnumerator();
-    }
+    public IEnumerator<Procedure> GetEnumerator() => procMap.Values.GetEnumerator();
 
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 
     #endregion
 
-    public CallGraph CallGraph
-    {
-        get { return callGraph; }
-    }
+    public CallGraph CallGraph { get; }
 }

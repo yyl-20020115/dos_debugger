@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-//using Util.Data;
 
 namespace Disassembler;
 
@@ -38,8 +37,8 @@ public interface Segment
     Range<int> OffsetBounds { get; }
 }
 
-#if false
-public enum SegmentType
+#if true
+public enum SegmentType : int
 {
     /// <summary>
     /// Indicates a logical segment.
@@ -84,7 +83,7 @@ public enum SegmentType
 /// </summary>
 public class SegmentCollection : IList<Segment>
 {
-    readonly List<Segment> segments = new List<Segment>();
+    readonly List<Segment> segments = [];
 
     public T Get<T>(int index) where T : Segment
     {

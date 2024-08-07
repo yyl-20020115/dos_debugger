@@ -20,12 +20,10 @@ public class CodeChecksum
 
     public static CodeChecksum Compute(Procedure procedure, BinaryImage image)
     {
-        using (HashAlgorithm hasher = MD5.Create())
-        {
-            ComputeMore(hasher, procedure, image);
-            hasher.TransformFinalBlock(new byte[0], 0, 0);
-            return new CodeChecksum(hasher.Hash);
-        }
+        using HashAlgorithm hasher = MD5.Create();
+        ComputeMore(hasher, procedure, image);
+        hasher.TransformFinalBlock([], 0, 0);
+        return new CodeChecksum(hasher.Hash);
     }
 
     private static void ComputeMore(
@@ -58,8 +56,7 @@ public class CodeChecksum
 
             // Check if this block has been visited before. If it has,
             // we just hash its order and work on next one.
-            int order;
-            if (visitOrder.TryGetValue(source, out order)) // visited
+            if (visitOrder.TryGetValue(source, out int order)) // visited
             {
                 ComputeMore(hasher, order);
                 continue;

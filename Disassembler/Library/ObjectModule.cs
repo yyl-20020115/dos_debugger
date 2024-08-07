@@ -80,5 +80,5 @@ public class ObjectModule : Module
         => aliases;
 
     public override string ToString() 
-        => this.Name == null ? this.SourceName : string.Format("{0} ({1})", this.Name, this.SourceName);
+        => this.Name == null ? this.SourceName : $"{this.Name} ({this.SourceName})";
 }

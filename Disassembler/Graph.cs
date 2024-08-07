@@ -21,7 +21,7 @@ internal class Graph<T1, T2>
         this.Edges.Clear();
     }
 
-    public IEnumerable<XRef> GetIncomingEdges(Address invalid)
+    public IEnumerable<XRef> GetIncomingEdges(Address source)
     {
         throw new NotImplementedException();
     }

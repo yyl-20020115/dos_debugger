@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-//using Util.Data;
 
 namespace Disassembler;
 
@@ -11,8 +10,7 @@ public class ExecutableImage : BinaryImage
     private readonly Address entryPoint;
 
     // Maps a frame number (before relocation) to a segment id.
-    private readonly SortedList<UInt16, int> mapFrameToSegment
-        = [];
+    private readonly SortedList<UInt16, int> mapFrameToSegment = [];
 
 #if false
     /// <summary>
@@ -44,15 +42,15 @@ public class ExecutableImage : BinaryImage
         this.bytes = file.Image;
 
         // Store relocatable locations for future use.
-        List<int> relocs = new List<int>();
-        foreach (FarPointer location in file.RelocatableLocations)
+        List<int> relocs = [];
+        foreach (var location in file.RelocatableLocations)
         {
             int index = location.Segment * 16 + location.Offset;
             if (index >= 0 && index < bytes.Length - 1)
                 relocs.Add(index);
         }
         relocs.Sort();
-        this.relocatableLocations = relocs.ToArray();
+        this.relocatableLocations = [.. relocs];
 
         // Guess segmentation info from the segment values to be
         // relocated. For example, if a relocatable location contains the
@@ -77,7 +75,7 @@ public class ExecutableImage : BinaryImage
         for (int i = 0; i < mapFrameToSegment.Count; i++)
         {
             UInt16 frameNumber = mapFrameToSegment.Keys[i];
-            ExecutableSegment segment = new ExecutableSegment(this, i, frameNumber);
+            var segment = new ExecutableSegment(this, i, frameNumber);
 
             // Compute offset bounds for this segment.
             // The lower bound is off course zero.
@@ -112,48 +110,27 @@ public class ExecutableImage : BinaryImage
     }
 #endif
 
-    public int[] RelocatableLocations
-    {
-        get { return relocatableLocations; }
-    }
+    public int[] RelocatableLocations => relocatableLocations;
 
-    public Address EntryPoint
-    {
-        get { return this.entryPoint; }
-    }
+    public Address EntryPoint => this.entryPoint;
 
-    public int MapFrameToSegment(UInt16 frameNumber)
-    {
-        return mapFrameToSegment[frameNumber];
-    }
+    public int MapFrameToSegment(UInt16 frameNumber) => mapFrameToSegment[frameNumber];
 
     public bool IsAddressRelocatable(Address address)
     {
         int index = ToLinearAddress(address);
-        if (Array.BinarySearch(relocatableLocations, index) >= 0)
-            return true;
-        else
-            return false;
+        return Array.BinarySearch(relocatableLocations, index) >= 0;
     }
 
-    public override string FormatAddress(Address address)
-    {
-        if (!IsAddressValid(address))
-            throw new ArgumentOutOfRangeException("address");
+    public override string FormatAddress(Address address) => !IsAddressValid(address)
+            ? throw new ArgumentOutOfRangeException("address")
+            : $"{((ExecutableSegment)base.Segments[address.Segment]).Frame:X4}:{address.Offset:X4}";
 
-        return string.Format("{0:X4}:{1:X4}",
-            ((ExecutableSegment)base.Segments[address.Segment]).Frame,
-            address.Offset);
-    }
-
-    private ExecutableSegment GetSegment(int index)
-    {
-        return (ExecutableSegment)base.Segments[index];
-    }
+    private ExecutableSegment GetSegment(int index) => (ExecutableSegment)base.Segments[index];
 
     private int ToLinearAddress(Address address)
     {
-        ExecutableSegment segment = (ExecutableSegment)base.Segments[address.Segment];
+        var segment = (ExecutableSegment)base.Segments[address.Segment];
         return segment.Frame * 16 + address.Offset;
     }
 
@@ -168,7 +145,7 @@ public class ExecutableImage : BinaryImage
 
     private void ExtendSegmentCoverage(int segmentIndex, int startOffset, int endOffset)
     {
-        ExecutableSegment segment = GetSegment(segmentIndex);
+        var segment = GetSegment(segmentIndex);
         if (segment.OffsetCoverage.IsSupersetOf(new Range<int>(startOffset, endOffset)))
             return;
 
@@ -187,7 +164,7 @@ public class ExecutableImage : BinaryImage
         // Shrink the offset bounds of its neighboring segments.
         if (segmentIndex > 0)
         {
-            ExecutableSegment segBefore = GetSegment(segmentIndex - 1);
+            var segBefore = GetSegment(segmentIndex - 1);
             int numBytesOverlap = 
                 (segBefore.Frame * 16 + segBefore.OffsetBounds.End) -
                 (segment.Frame * 16 + segment.OffsetCoverage.Begin);
@@ -200,7 +177,7 @@ public class ExecutableImage : BinaryImage
         }
         if (segmentIndex < base.Segments.Count - 1)
         {
-            ExecutableSegment segAfter = GetSegment(segmentIndex + 1);
+            var segAfter = GetSegment(segmentIndex + 1);
             int numBytesOverlap =
                 (segment.Frame * 16 + segment.OffsetCoverage.End) -
                 (segAfter.Frame * 16 + segAfter.OffsetBounds.Begin);
