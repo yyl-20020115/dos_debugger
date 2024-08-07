@@ -34,7 +34,7 @@ public interface Segment
     /// 
     /// The returned range does not necessarily start from offset zero.
     /// </summary>
-    Range<int> OffsetBounds { get; }
+    IntRange OffsetBounds { get; }
 }
 
 #if true

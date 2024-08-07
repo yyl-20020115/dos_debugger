@@ -232,7 +232,7 @@ public class ByteAttributeCollection(BinaryImage image)
 
         int offset = location.Offset;
         if (!image.Segments[segmentIndex].OffsetBounds.IsSupersetOf(
-            new Range<int>(offset, offset + count)))
+            new IntRange(offset, offset + count)))
             throw new ArgumentOutOfRangeException("location");
 
         for (int i = attrs.Count; i < image.Segments.Count; i++)

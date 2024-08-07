@@ -53,7 +53,7 @@ public class BasicBlock
 
     public BasicBlockType Type => type;
 
-    public Range<Address> Bounds => new Range<Address>(location, location + length);
+    public AddressRange Bounds => new AddressRange(location, location + length);
 
     public override string ToString() => $"{Bounds} ({Type})";
 

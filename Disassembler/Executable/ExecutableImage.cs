@@ -92,7 +92,7 @@ public class ExecutableImage : BinaryImage
                         mapFrameToSegment.Keys[i + 1] * 16 + 15 - startIndex);
                 }
                 segment.SetOffsetBounds(
-                    new Range<int>(offsetLowerBound, offsetUpperBound));
+                    new IntRange(offsetLowerBound, offsetUpperBound));
             }
 
             mapFrameToSegment[frameNumber] = i;
@@ -146,17 +146,17 @@ public class ExecutableImage : BinaryImage
     private void ExtendSegmentCoverage(int segmentIndex, int startOffset, int endOffset)
     {
         var segment = GetSegment(segmentIndex);
-        if (segment.OffsetCoverage.IsSupersetOf(new Range<int>(startOffset, endOffset)))
+        if (segment.OffsetCoverage.IsSupersetOf(new IntRange(startOffset, endOffset)))
             return;
 
         // Extend the segment's offset coverage.
         if (segment.OffsetCoverage.IsEmpty)
         {
-            segment.OffsetCoverage = new Range<int>(startOffset, endOffset);
+            segment.OffsetCoverage = new IntRange(startOffset, endOffset);
         }
         else
         {
-            segment.OffsetCoverage = new Range<int>(
+            segment.OffsetCoverage = new IntRange(
                 Math.Min(segment.OffsetCoverage.Begin, startOffset),
                 Math.Max(segment.OffsetCoverage.End, endOffset));
         }
@@ -170,7 +170,7 @@ public class ExecutableImage : BinaryImage
                 (segment.Frame * 16 + segment.OffsetCoverage.Begin);
             if (numBytesOverlap > 0)
             {
-                segBefore.SetOffsetBounds(new Range<int>(
+                segBefore.SetOffsetBounds(new IntRange(
                     segBefore.OffsetBounds.Begin,
                     segBefore.OffsetBounds.End - numBytesOverlap));
             }
@@ -183,7 +183,7 @@ public class ExecutableImage : BinaryImage
                 (segAfter.Frame * 16 + segAfter.OffsetBounds.Begin);
             if (numBytesOverlap > 0)
             {
-                segAfter.SetOffsetBounds(new Range<int>(
+                segAfter.SetOffsetBounds(new IntRange(
                     segAfter.OffsetBounds.Begin + numBytesOverlap,
                     segAfter.OffsetBounds.End));
             }
@@ -218,9 +218,9 @@ public class ExecutableSegment(ExecutableImage image, int id, UInt16 frameNumber
 
     public string Name => Frame.ToString("X4");
 
-    public Range<int> OffsetBounds { get; private set; }
+    public IntRange OffsetBounds { get; private set; }
 
-    internal void SetOffsetBounds(Range<int> bounds)
+    internal void SetOffsetBounds(IntRange bounds)
     {
         this.OffsetBounds = bounds;
     }
@@ -228,7 +228,7 @@ public class ExecutableSegment(ExecutableImage image, int id, UInt16 frameNumber
     /// <summary>
     /// Gets or sets the range of offsets that are analyzed.
     /// </summary>
-    public Range<int> OffsetCoverage { get; set; }
+    public IntRange OffsetCoverage { get; set; }
 
     /// <summary>
     /// Gets the frame number of the canonical frame of this segment,

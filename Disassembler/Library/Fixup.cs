@@ -25,7 +25,7 @@ public class Fixup(int offset = 0)
     /// <summary>
     /// Gets the location to fix up.
     /// </summary>
-    public Range<int> Location
+    public IntRange Location
     {
         get { return location; }
     }

@@ -42,5 +42,5 @@ public class LibrarySegment(LogicalSegment segment) : Segment
 
     string Segment.Name => segment.FullName;
 
-    Range<int> Segment.OffsetBounds => new(0, segment.Length);
+    IntRange Segment.OffsetBounds => new(0, segment.Length);
 }

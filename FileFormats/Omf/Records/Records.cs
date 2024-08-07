@@ -498,12 +498,8 @@ class COMDEFRecord : Record
     }
 }
 
-class LCOMDEFRecord : COMDEFRecord
+class LCOMDEFRecord(RecordReader reader, RecordContext context) : COMDEFRecord(reader, context)
 {
-    public LCOMDEFRecord(RecordReader reader, RecordContext context)
-        : base(reader, context)
-    {
-    }
 }
 
 /// <summary>
@@ -614,13 +610,8 @@ class LIDATARecord : Record
     }
 }
 
-class COMDATRecord : Record
+class COMDATRecord(RecordReader reader, RecordContext context) : Record(reader, context)
 {
-    public COMDATRecord(RecordReader reader, RecordContext context)
-        : base(reader, context)
-    {
-        // TODO: parse contents.
-    }
 }
 
 class ALIASRecord : Record
