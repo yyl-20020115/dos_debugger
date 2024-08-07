@@ -1,26 +1,27 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
-namespace Disassembler
+namespace Disassembler;
+
+public class PriorityQueue<T> : Queue<T>
 {
-    internal class PriorityQueue<T>
+    private Func<XRef, XRef, int> compareByPriority;
+
+    public PriorityQueue(Func<XRef, XRef, int> compareByPriority)
     {
-        private Func<XRef, XRef, int> compareByPriority;
+        this.compareByPriority = compareByPriority;
+    }
 
-        public PriorityQueue(Func<XRef, XRef, int> compareByPriority)
-        {
-            this.compareByPriority = compareByPriority;
-        }
+    public bool IsEmpty { get; internal set; }
 
-        public bool IsEmpty { get; internal set; }
+    public new XRef Dequeue()
+    {
+        throw new NotImplementedException();
+    }
 
-        internal XRef Dequeue()
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void Enqueue(XRef xRef)
-        {
-            throw new NotImplementedException();
-        }
+    public void Enqueue(XRef xRef)
+    {
+        throw new NotImplementedException();
     }
 }

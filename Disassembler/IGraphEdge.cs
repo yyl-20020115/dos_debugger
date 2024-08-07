@@ -1,6 +1,5 @@
-﻿namespace Disassembler
+﻿namespace Disassembler;
+
+public interface IGraphEdge<T>
 {
-    public interface IGraphEdge<T>
-    {
-    }
 }

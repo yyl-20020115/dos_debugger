@@ -9,24 +9,24 @@ internal class Graph<T1, T2>
     {
     }
 
-    public List<XRef> Edges { get; internal set; }
+    public List<XRef> Edges { get; internal set; } = [];
 
-    internal void AddEdge(XRef xref)
+    public void AddEdge(XRef xref)
+    {
+        this.Edges.Add(xref);
+    }
+
+    public void Clear()
+    {
+        this.Edges.Clear();
+    }
+
+    public IEnumerable<XRef> GetIncomingEdges(Address invalid)
     {
         throw new NotImplementedException();
     }
 
-    internal void Clear()
-    {
-        throw new NotImplementedException();
-    }
-
-    internal IEnumerable<XRef> GetIncomingEdges(Address invalid)
-    {
-        throw new NotImplementedException();
-    }
-
-    internal IEnumerable<XRef> GetOutgoingEdges(Address source)
+    public IEnumerable<XRef> GetOutgoingEdges(Address source)
     {
         throw new NotImplementedException();
     }

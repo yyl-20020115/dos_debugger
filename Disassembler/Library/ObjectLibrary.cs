@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.ComponentModel;
+using System.Linq;
 
 namespace Disassembler;
 
@@ -33,20 +33,14 @@ public class ObjectLibrary : Assembly
 
     public string FileName { get; set; }
 
-    public string Name
-    {
-        get { return System.IO.Path.GetFileName(FileName); }
-    }
+    public string Name => System.IO.Path.GetFileName(FileName);
 
     public readonly SortedDictionary<string, List<ObjectModule>> Symbols
         = new SortedDictionary<string, List<ObjectModule>>();
 
     public LibraryImage Image { get; set; }
 
-    public override BinaryImage GetImage()
-    {
-        return Image;
-    }
+    public override BinaryImage GetImage() => Image;
 
     public IEnumerable<string> GetUnresolvedSymbols()
     {
@@ -62,7 +56,7 @@ public class ObjectLibrary : Assembly
         if (name == null)
             throw new ArgumentNullException("name");
 
-        foreach (ObjectModule module in Modules)
+        foreach (ObjectModule module in Modules.Cast<ObjectModule>())
         {
             if (module.Name == name)
                 return module;
@@ -92,8 +86,7 @@ public class ObjectLibrary : Assembly
         {
             foreach (DefinedSymbol name in module.DefinedNames)
             {
-                List<ObjectModule> definitionList;
-                if (!Symbols.TryGetValue(name.Name, out definitionList))
+                if (!Symbols.TryGetValue(name.Name, out List<ObjectModule> definitionList))
                 {
                     definitionList = new List<ObjectModule>(1);
                     Symbols.Add(name.Name, definitionList);
@@ -105,7 +98,7 @@ public class ObjectLibrary : Assembly
 
         // Next, try to resolve each external symbol.
         // TODO: check aliases.
-        foreach (ObjectModule module in Modules)
+        foreach (ObjectModule module in Modules.Cast<ObjectModule>())
         {
             foreach (var name in module.ExternalNames)
             {

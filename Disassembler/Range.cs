@@ -11,7 +11,8 @@ public class Range<T>(T Begin, T End) where T : struct
 
     public bool Contains(T address)
     {
-        throw new NotImplementedException();
+        //TODO:
+        return false;// address >= this.Begin && address < this.End;
     }
 
     public bool IsSupersetOf(Range<int> range)

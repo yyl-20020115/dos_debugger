@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 //using Util.Data;
-using X86Codec;
 
 namespace Disassembler;
 
 public class ExecutableImage : BinaryImage
 {
-    readonly byte[] bytes;
-    readonly int[] relocatableLocations;
-    readonly Address entryPoint;
+    private readonly byte[] bytes;
+    private readonly int[] relocatableLocations;
+    private readonly Address entryPoint;
 
     // Maps a frame number (before relocation) to a segment id.
-    readonly SortedList<UInt16, int> mapFrameToSegment
-        = new SortedList<UInt16, int>();
+    private readonly SortedList<UInt16, int> mapFrameToSegment
+        = [];
 
 #if false
     /// <summary>
@@ -235,65 +233,32 @@ public class ExecutableImage : BinaryImage
 /// <summary>
 /// Contains information about a segment in an executable file.
 /// </summary>
-public class ExecutableSegment : Segment
+public class ExecutableSegment(ExecutableImage image, int id, UInt16 frameNumber) : Segment
 {
-    readonly ExecutableImage image;
-    readonly UInt16 frameNumber;
-    readonly int id;
+    private readonly ExecutableImage image = image;
 
-    private Range<int> offsetBounds;
-    private Range<int> offsetCoverage;
+    public int Id { get; } = id;
 
-    public ExecutableSegment(ExecutableImage image, int id, UInt16 frameNumber)
-    {
-        this.id = id;
-        this.image = image;
-        this.frameNumber = frameNumber;
-    }
+    public string Name => Frame.ToString("X4");
 
-    public int Id
-    {
-        get { return this.id; }
-    }
-
-    public string Name
-    {
-        get { return frameNumber.ToString("X4"); }
-    }
-
-    public Range<int> OffsetBounds
-    {
-        get { return offsetBounds; }
-    }
+    public Range<int> OffsetBounds { get; private set; }
 
     internal void SetOffsetBounds(Range<int> bounds)
     {
-        this.offsetBounds = bounds;
+        this.OffsetBounds = bounds;
     }
 
     /// <summary>
     /// Gets or sets the range of offsets that are analyzed.
     /// </summary>
-    public Range<int> OffsetCoverage
-    {
-        get { return this.offsetCoverage; }
-        set { this.offsetCoverage = value; }
-    }
+    public Range<int> OffsetCoverage { get; set; }
 
     /// <summary>
     /// Gets the frame number of the canonical frame of this segment,
     /// relative to the beginning of the executable image.
     /// </summary>
-    public UInt16 Frame
-    {
-        get { return frameNumber; }
-    }
+    public UInt16 Frame { get; } = frameNumber;
 
-    public override string ToString()
-    {
-        return string.Format(
-            "seg{0:000}: {1:X4}:{2:X4}-{1:X4}:{3:X4}",
-            Id, frameNumber, 
-            OffsetBounds.Begin, OffsetBounds.End - 1);
-    }
+    public override string ToString() 
+        => $"seg{Id:000}: {Frame:X4}:{OffsetBounds.Begin:X4}-{Frame:X4}:{OffsetBounds.End - 1:X4}";
 }

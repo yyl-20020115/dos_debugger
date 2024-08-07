@@ -6,28 +6,15 @@ namespace Disassembler;
 /// Provides methods to disassemble a 16-bit executable without symbol
 /// information.
 /// </summary>
-public class ExecutableDisassembler : DisassemblerBase
+public class ExecutableDisassembler(Executable executable) 
+    : DisassemblerBase(executable.Image)
 {
-    readonly Executable executable;
-
-    public ExecutableDisassembler(Executable executable)
-        : base(executable.Image)
-    {
-        this.executable = executable;
-    }
-
-    public override Assembly Assembly
-    {
-        get { return executable; }
-    }
+    public override Assembly Assembly => executable;
 
     /// <summary>
     /// Gets the executable being disassembled.
     /// </summary>
-    public Executable Executable
-    {
-        get { return executable; }
-    }
+    public Executable Executable => executable;
 
     protected override Instruction DecodeInstruction(Address address)
     {

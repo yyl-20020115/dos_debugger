@@ -9,9 +9,6 @@ namespace Disassembler;
 /// </summary>
 public class MZFile
 {
-    private MZHeader header;
-    private FarPointer[] relocationTable;
-    private byte[] image;
 
     /// <summary>
     /// Loads a DOS MZ executable file from disk.
@@ -22,69 +19,69 @@ public class MZFile
         if (fileName == null)
             throw new ArgumentNullException("fileName");
 
-        using (FileStream stream = new FileStream(fileName,
-            FileMode.Open, FileAccess.Read, FileShare.Read))
-        using (BinaryReader reader = new BinaryReader(stream))
+        using var stream = new FileStream(fileName,
+            FileMode.Open, FileAccess.Read, FileShare.Read);
+        using var reader = new BinaryReader(stream);
+        // Read file header.
+        Header = new MZHeader
         {
-            // Read file header.
-            header = new MZHeader();
-            header.Signature = reader.ReadUInt16();
-            header.LastPageSize = reader.ReadUInt16();
-            header.PageCount = reader.ReadUInt16();
-            header.RelocCount = reader.ReadUInt16();
-            header.HeaderSize = reader.ReadUInt16();
-            header.MinAlloc = reader.ReadUInt16();
-            header.MaxAlloc = reader.ReadUInt16();
-            header.InitialSS = reader.ReadUInt16();
-            header.InitialSP = reader.ReadUInt16();
-            header.Checksum = reader.ReadUInt16();
-            header.InitialIP = reader.ReadUInt16();
-            header.InitialCS = reader.ReadUInt16();
-            header.RelocOff = reader.ReadUInt16();
-            header.Overlay = reader.ReadUInt16();
+            Signature = reader.ReadUInt16(),
+            LastPageSize = reader.ReadUInt16(),
+            PageCount = reader.ReadUInt16(),
+            RelocCount = reader.ReadUInt16(),
+            HeaderSize = reader.ReadUInt16(),
+            MinAlloc = reader.ReadUInt16(),
+            MaxAlloc = reader.ReadUInt16(),
+            InitialSS = reader.ReadUInt16(),
+            InitialSP = reader.ReadUInt16(),
+            Checksum = reader.ReadUInt16(),
+            InitialIP = reader.ReadUInt16(),
+            InitialCS = reader.ReadUInt16(),
+            RelocOff = reader.ReadUInt16(),
+            Overlay = reader.ReadUInt16()
+        };
 
-            // Verify signature. Both 'MZ' and 'ZM' are allowed.
-            if (!(header.Signature == 0x5A4D || header.Signature == 0x4D5A))
-                throw new InvalidDataException("Signature mismatch.");
+        // Verify signature. Both 'MZ' and 'ZM' are allowed.
+        if (!(Header.Signature == 0x5A4D || Header.Signature == 0x4D5A))
+            throw new InvalidDataException("Signature mismatch.");
 
-            // Calculate the stated size of the executable.
-            if (header.PageCount <= 0)
-                throw new InvalidDataException("The PageCount field must be positive.");
-            int fileSize = header.PageCount * 512 -
-                (header.LastPageSize > 0 ? 512 - header.LastPageSize : 0);
+        // Calculate the stated size of the executable.
+        if (Header.PageCount <= 0)
+            throw new InvalidDataException("The PageCount field must be positive.");
+        int fileSize = Header.PageCount * 512 -
+            (Header.LastPageSize > 0 ? 512 - Header.LastPageSize : 0);
 
-            // Make sure the stated file size is within the actual file size.
-            if (fileSize > stream.Length)
-                throw new InvalidDataException("The stated file size is larger than the actual file size.");
+        // Make sure the stated file size is within the actual file size.
+        if (fileSize > stream.Length)
+            throw new InvalidDataException("The stated file size is larger than the actual file size.");
 
-            // Validate the header size.
-            int headerSize = header.HeaderSize * 16;
-            if (headerSize < 28 || headerSize > fileSize)
-                throw new InvalidDataException("The stated header size is invalid.");
+        // Validate the header size.
+        int headerSize = Header.HeaderSize * 16;
+        if (headerSize < 28 || headerSize > fileSize)
+            throw new InvalidDataException("The stated header size is invalid.");
 
-            // Make sure the relocation table is within the header.
-            if (header.RelocOff < 28 ||
-                header.RelocOff + header.RelocCount * 4 > headerSize)
-            {
-                throw new InvalidDataException("The relocation table location is invalid.");
-            }
-
-            // Load relocation table.
-            relocationTable = new FarPointer[header.RelocCount];
-            stream.Seek(header.RelocOff, SeekOrigin.Begin);
-            for (int i = 0; i < header.RelocCount; i++)
-            {
-                UInt16 off = reader.ReadUInt16();
-                UInt16 seg = reader.ReadUInt16();
-                relocationTable[i] = new FarPointer(seg, off);
-            }
-
-            // Load the whole image into memory.
-            int imageSize = fileSize - headerSize;
-            stream.Seek(headerSize, SeekOrigin.Begin);
-            image = new byte[imageSize];
-            stream.Read(image, 0, image.Length);
+        // Make sure the relocation table is within the header.
+        if (Header.RelocOff < 28 ||
+            Header.RelocOff + Header.RelocCount * 4 > headerSize)
+        {
+            throw new InvalidDataException("The relocation table location is invalid.");
         }
+
+        // Load relocation table.
+        RelocatableLocations = new FarPointer[Header.RelocCount];
+        stream.Seek(Header.RelocOff, SeekOrigin.Begin);
+        for (int i = 0; i < Header.RelocCount; i++)
+        {
+            UInt16 off = reader.ReadUInt16();
+            UInt16 seg = reader.ReadUInt16();
+            RelocatableLocations[i] = new FarPointer(seg, off);
+        }
+
+        // Load the whole image into memory.
+        int imageSize = fileSize - headerSize;
+        stream.Seek(headerSize, SeekOrigin.Begin);
+        Image = new byte[imageSize];
+        stream.Read(Image, 0, Image.Length);
     }
 
     /// <summary>
@@ -93,18 +90,18 @@ public class MZFile
     /// <param name="segment">The segment to relocate to.</param>
     public void Relocate(UInt16 segment)
     {
-        header.InitialCS += segment;
-        header.InitialSS += segment;
-        for (int i = 0; i < relocationTable.Length; i++)
+        Header.InitialCS += segment;
+        Header.InitialSS += segment;
+        for (int i = 0; i < RelocatableLocations.Length; i++)
         {
-            int address = relocationTable[i].Segment * 16 + relocationTable[i].Offset;
-            if (!(address >= 0 && address + 2 <= image.Length))
+            int address = RelocatableLocations[i].Segment * 16 + RelocatableLocations[i].Offset;
+            if (!(address >= 0 && address + 2 <= Image.Length))
                 throw new InvalidDataException("The relocation entry is out-of-range.");
 
-            UInt16 current = BitConverter.ToUInt16(image, address);
+            UInt16 current = BitConverter.ToUInt16(Image, address);
             current += segment;
-            image[address] = (byte)(current & 0xff);
-            image[address + 1] = (byte)(current >> 8);
+            Image[address] = (byte)(current & 0xff);
+            Image[address + 1] = (byte)(current >> 8);
         }
         baseAddress.Segment = segment;
     }
@@ -126,18 +123,12 @@ public class MZFile
     /// Gets the executable image.
     /// </summary>
     [Browsable(false)]
-    public byte[] Image
-    {
-        get { return image; }
-    }
+    public byte[] Image { get; }
 
     /// <summary>
     /// Gets the number of bytes in the executable image.
     /// </summary>
-    public int ImageSize
-    {
-        get { return image.Length; }
-    }
+    public int ImageSize => Image.Length;
 
     /// <summary>
     /// Gets a collection of relocation entries. Each relocation entry is
@@ -146,36 +137,24 @@ public class MZFile
     /// The module loader should add the actual segment to the word at
     /// these locations.
     /// </summary>
-    public FarPointer[] RelocatableLocations
-    {
-        get { return relocationTable; }
-    }
+    public FarPointer[] RelocatableLocations { get; }
 
     /// <summary>
     /// Gets the address of the first instruction to execute. This address
     /// is relative to the beginning of the executable image.
     /// </summary>
-    public FarPointer EntryPoint
-    {
-        get { return new FarPointer(header.InitialCS, header.InitialIP); }
-    }
+    public FarPointer EntryPoint => new(Header.InitialCS, Header.InitialIP);
 
     /// <summary>
     /// Gets the address of the top of the stack. This address is relative
     /// to the beginning of the executable image.
     /// </summary>
-    public FarPointer StackTop
-    {
-        get { return new FarPointer(header.InitialSS, header.InitialSP); }
-    }
+    public FarPointer StackTop => new(Header.InitialSS, Header.InitialSP);
 
     /// <summary>
     /// Gets a copy of the file header.
     /// </summary>
-    public MZHeader Header
-    {
-        get { return header; }
-    }
+    public MZHeader Header { get; }
 }
 
 /// <summary>
@@ -239,8 +218,5 @@ public struct FarPointer
         this.Offset = offset;
     }
 
-    public int LinearAddress
-    {
-        get { return Segment * 16 + Offset; }
-    }
+    public readonly int LinearAddress => Segment * 16 + Offset;
 }

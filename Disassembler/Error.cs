@@ -1,235 +1,173 @@
 ﻿using System;
 using System.Collections.Generic;
-//using Util;
 
-namespace Disassembler
+namespace Disassembler;
+
+public static class AttributeUtils
 {
-    public static class AttributeUtils
+    //TODO:
+    public static Attribute GetAttribute<Attribute>(this Enum attribute)
     {
-        //TODO:
-        public static Attribute GetAttribute<Attribute>(this Enum attribute)
-        {
-            return default;
-        }
-
+        return default;
     }
+
+}
+/// <summary>
+/// Contains information about an error encountered during disassembling.
+/// </summary>
+public class Error(Address location, ErrorCode errorCode, string message)
+{
+    readonly Address location = location;
+    readonly string message = message;
+
+    public ErrorCode ErrorCode { get; } = errorCode;
+
+    public ErrorCategory Category
+    {
+        get
+        {
+            var attribute = ErrorCode.GetAttribute<ErrorCategoryAttribute>();
+            return attribute != null ? attribute.Category : ErrorCategory.Error;
+        }
+    }
+
+    public Address Location => location;
+
+    public string Message => message;
+
+    public static int CompareByLocation(Error x, Error y) => x.Location.CompareTo(y.Location);
+}
+
+[Flags]
+public enum ErrorCategory : int
+{
+    None = 0,
+    Error = 1,
+    Warning = 2,
+    Message = 4,
+}
+
+public class ErrorCategoryAttribute(ErrorCategory category) : Attribute
+{
+    public ErrorCategory Category { get; } = category;
+}
+
+public enum ErrorCode : int
+{
+    [ErrorCategory(ErrorCategory.None)]
+    OK = 0,
+
+    GenericError,
+    InvalidInstruction,
+    BrokenFixup,
+
     /// <summary>
-    /// Contains information about an error encountered during disassembling.
+    /// Indicates that the same procedure (identified by its entry point
+    /// address) was called both near and far. Since a near call must be
+    /// returned with RETN and a far call with RETF, this error indicates
+    /// a potential problem with the analysis.
     /// </summary>
-    public class Error
-    {
-        readonly Address location;
-        readonly ErrorCode errorCode;
-        readonly string message;
+    /// [Summary]
+    /// [Description]
+    /// [Example]
+    /// [Solution]
+    [ErrorCategory(ErrorCategory.Warning)]
+    InconsistentCall,
 
-        public Error(Address location, ErrorCode errorCode, string message)
-        {
-            this.location = location;
-            this.errorCode = errorCode;
-            this.message = message;
-        }
+    /// <summary>
+    /// Indicates that data was encountered when code was expected.
+    /// </summary>
+    RanIntoData,
 
-        public ErrorCode ErrorCode
-        {
-            get { return errorCode; }
-        }
+    /// <summary>
+    /// Indicates that we ran into the middle of an instruction.
+    /// </summary>
+    RanIntoCode,
 
-        public ErrorCategory Category
-        {
-            get
-            {
-                var attribute = errorCode.GetAttribute<ErrorCategoryAttribute>();
-                if (attribute != null)
-                    return attribute.Category;
-                else
-                    return ErrorCategory.Error;
-            }
-        }
+    /// <summary>
+    /// While analyzing a basic block, a decoded instruction would 
+    /// overlap with existing bytes that are already analyzed as code
+    /// or data.
+    /// </summary>
+    /// <remarks>
+    /// Possible causes for this error include:
+    /// - 
+    /// - Other analysis errors.
+    /// </remarks>
+    [ErrorCategory(ErrorCategory.Error)]
+    OverlappingInstruction,
 
-        public Address Location
-        {
-            get { return location; }
-        }
+    /// <summary>
+    /// After executing an instruction, the CS:IP pointer would wrap
+    /// around 0xFFFF.
+    /// </summary>
+    /// <remarks>
+    /// While it is technically allowed (and occassionally useful) to let
+    /// CS:IP wrap, this situation typically indicates an analysis error.
+    /// </remarks>
+    [ErrorCategory(ErrorCategory.Error)]
+    AddressWrapped,
 
-        public string Message
-        {
-            get { return message; }
-        }
+    /// <summary>
+    /// The target of a branch/call/jump instruction cannot be determined
+    /// through static analysis.
+    /// </summary>
+    /// <remarks>
+    /// To resolve this problem, dynamic analysis can be employed.
+    /// </remarks>
+    [ErrorCategory(ErrorCategory.Message)]
+    DynamicTarget,
 
-        public static int CompareByLocation(Error x, Error y)
-        {
-            return x.Location.CompareTo(y.Location);
-        }
-    }
+    /// <summary>
+    /// The target of a branch/call/jump instruction refers to a fix-up
+    /// target, but the target cannot be resolved.
+    /// </summary>
+    UnresolvedTarget,
 
-    [Flags]
-    public enum ErrorCategory
-    {
-        None = 0,
-        Error = 1,
-        Warning = 2,
-        Message = 4,
-    }
+    /// <summary>
+    /// The target of a branch/call/jump instruction refers to a location
+    /// outside of the binary image.
+    /// </summary>
+    OutOfImage,
 
-    public class ErrorCategoryAttribute : Attribute
-    {
-        readonly ErrorCategory category;
+    /// <summary>
+    /// Indicates that a basic block ended prematurally due to an anlysis
+    /// error.
+    /// </summary>
+    BrokenBasicBlock,
 
-        public ErrorCategoryAttribute(ErrorCategory category)
-        {
-            this.category = category;
-        }
+    /// <summary>
+    /// Indicates that a fixup is intentionally discarded because it
+    /// might not suit the purpose of the analysis. This is currently
+    /// used only with floating point emulator fix-ups.
+    /// </summary>
+    [ErrorCategory(ErrorCategory.Warning)]
+    FixupDiscarded,
+}
 
-        public ErrorCategory Category
-        {
-            get { return category; }
-        }
-    }
+// Note: errorcollection and fixupcollection actually have similar
+// data structures, so we should find a way to merge them. However,
+// a fixup collection doesn't allow multiple errors at the same
+// location, but we allow them here.
+public class ErrorCollection : ICollection<Error>
+{
+    readonly List<Error> errors = [];
 
-    public enum ErrorCode
-    {
-        [ErrorCategory(ErrorCategory.None)]
-        OK = 0,
+    public void Add(Error error) => errors.Add(error);
 
-        GenericError,
-        InvalidInstruction,
-        BrokenFixup,
+    public void Clear() => errors.Clear();
 
-        /// <summary>
-        /// Indicates that the same procedure (identified by its entry point
-        /// address) was called both near and far. Since a near call must be
-        /// returned with RETN and a far call with RETF, this error indicates
-        /// a potential problem with the analysis.
-        /// </summary>
-        /// [Summary]
-        /// [Description]
-        /// [Example]
-        /// [Solution]
-        [ErrorCategory(ErrorCategory.Warning)]
-        InconsistentCall,
+    public bool Contains(Error item) => errors.Contains(item);
 
-        /// <summary>
-        /// Indicates that data was encountered when code was expected.
-        /// </summary>
-        RanIntoData,
+    public void CopyTo(Error[] array, int arrayIndex) => errors.CopyTo(array, arrayIndex);
 
-        /// <summary>
-        /// Indicates that we ran into the middle of an instruction.
-        /// </summary>
-        RanIntoCode,
+    public int Count => errors.Count;
 
-        /// <summary>
-        /// While analyzing a basic block, a decoded instruction would 
-        /// overlap with existing bytes that are already analyzed as code
-        /// or data.
-        /// </summary>
-        /// <remarks>
-        /// Possible causes for this error include:
-        /// - 
-        /// - Other analysis errors.
-        /// </remarks>
-        [ErrorCategory(ErrorCategory.Error)]
-        OverlappingInstruction,
+    public bool IsReadOnly => false;
 
-        /// <summary>
-        /// After executing an instruction, the CS:IP pointer would wrap
-        /// around 0xFFFF.
-        /// </summary>
-        /// <remarks>
-        /// While it is technically allowed (and occassionally useful) to let
-        /// CS:IP wrap, this situation typically indicates an analysis error.
-        /// </remarks>
-        [ErrorCategory(ErrorCategory.Error)]
-        AddressWrapped,
+    public bool Remove(Error item) => errors.Remove(item);
 
-        /// <summary>
-        /// The target of a branch/call/jump instruction cannot be determined
-        /// through static analysis.
-        /// </summary>
-        /// <remarks>
-        /// To resolve this problem, dynamic analysis can be employed.
-        /// </remarks>
-        [ErrorCategory(ErrorCategory.Message)]
-        DynamicTarget,
+    public IEnumerator<Error> GetEnumerator() => errors.GetEnumerator();
 
-        /// <summary>
-        /// The target of a branch/call/jump instruction refers to a fix-up
-        /// target, but the target cannot be resolved.
-        /// </summary>
-        UnresolvedTarget,
-
-        /// <summary>
-        /// The target of a branch/call/jump instruction refers to a location
-        /// outside of the binary image.
-        /// </summary>
-        OutOfImage,
-
-        /// <summary>
-        /// Indicates that a basic block ended prematurally due to an anlysis
-        /// error.
-        /// </summary>
-        BrokenBasicBlock,
-
-        /// <summary>
-        /// Indicates that a fixup is intentionally discarded because it
-        /// might not suit the purpose of the analysis. This is currently
-        /// used only with floating point emulator fix-ups.
-        /// </summary>
-        [ErrorCategory(ErrorCategory.Warning)]
-        FixupDiscarded,
-    }
-
-    // Note: errorcollection and fixupcollection actually have similar
-    // data structures, so we should find a way to merge them. However,
-    // a fixup collection doesn't allow multiple errors at the same
-    // location, but we allow them here.
-    public class ErrorCollection : ICollection<Error>
-    {
-        readonly List<Error> errors = new List<Error>();
-
-        public void Add(Error error)
-        {
-            errors.Add(error);
-        }
-
-        public void Clear()
-        {
-            errors.Clear();
-        }
-
-        public bool Contains(Error item)
-        {
-            return errors.Contains(item);
-        }
-
-        public void CopyTo(Error[] array, int arrayIndex)
-        {
-            errors.CopyTo(array, arrayIndex);
-        }
-
-        public int Count
-        {
-            get { return errors.Count; }
-        }
-
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
-
-        public bool Remove(Error item)
-        {
-            return errors.Remove(item);
-        }
-
-        public IEnumerator<Error> GetEnumerator()
-        {
-            return errors.GetEnumerator();
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-    }
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 }
