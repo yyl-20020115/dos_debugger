@@ -247,23 +247,11 @@ internal class LibraryBrowserViewModel(ObjectLibrary library)
                     return "ConstantImage";
                 }
 
-                string className = Symbol.BaseSegment.Class;
-                if (className.EndsWith("CODE"))
-                {
-                    if (Symbol.Scope == SymbolScope.Private)
-                        return "LocalProcedureImage";
-                    else
-                        return "ProcedureImage";
-                }
-                else if (className.EndsWith("DATA"))
-                {
-                    if (Symbol.Scope == SymbolScope.Private)
-                        return "LocalFieldImage";
-                    else
-                        return "FieldImage";
-                }
-                else
-                    return null;
+                var className = Symbol.BaseSegment.Class;
+                return className.EndsWith("CODE")
+                    ? Symbol.Scope == SymbolScope.Private ? "LocalProcedureImage" : "ProcedureImage"
+                    : className.EndsWith("DATA") 
+                    ? Symbol.Scope == SymbolScope.Private ? "LocalFieldImage" : "FieldImage" : null;
             }
         }
 

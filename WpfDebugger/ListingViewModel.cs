@@ -29,7 +29,7 @@ public class ListingViewModel
     /// 2, it saves extra memory indirections and is thus faster.
     /// The cost is of course a little extra memory footprint.
     /// </summary>
-    private int[] rowAddresses; // rename to rowOffsets
+    private readonly int[] rowAddresses; // rename to rowOffsets
 
     public ListingViewModel(Assembly assembly, int segmentId)
     {
@@ -39,16 +39,16 @@ public class ListingViewModel
         // put this logic into ErrorCollection. But for convenience we
         // leave it here for the moment.
         List<Error> errors =
-            (from error in assembly.GetImage().Errors
+            [.. (from error in assembly.GetImage().Errors
              where error.Location.Segment == segmentId
              orderby error.Location
-             select error).ToList();
+             select error)];
         int iError = 0;
 
         // Find the segment. 
         // Todo: we should provide a way to do this.
         Segment segment = null;
-        foreach (Segment seg in image.Segments)
+        foreach (var seg in image.Segments)
         {
             if (seg.Id == segmentId)
             {
@@ -59,7 +59,7 @@ public class ListingViewModel
 
         // Display analyzed code and data.
         // TODO: a segment may not start at zero.
-        Address address = new Address(segmentId, segment.OffsetBounds.Begin);
+        var address = new Address(segmentId, segment.OffsetBounds.Begin);
         while (image.IsAddressValid(address))
         {
             var b = image[address];
@@ -106,7 +106,7 @@ public class ListingViewModel
                 {
                     //    rows.Add(new ErrorListingRow(errorMap[i]));
                 }
-                Address j = address + 1;
+                var j = address + 1;
                 while (image.IsAddressValid(j) &&
                        !IsLeadByteOfCode(image[j]) &&
                        !IsLeadByteOfData(image[j]))
@@ -226,10 +226,7 @@ public class ListingViewModel
         }
     }
 
-    public List<ProcedureItem> ProcedureItems
-    {
-        get { return procItems; }
-    }
+    public List<ProcedureItem> ProcedureItems => procItems;
 
     //public List<SegmentItem> SegmentItems
     //{
@@ -273,7 +270,7 @@ public abstract class ListingRow(Assembly assembly, Address location)
         {
             // Check whether we have a procedure starting at this address.
             var proc = assembly.GetImage().Procedures.Find(this.Location);
-            return proc != null ? proc.Name : null;
+            return proc?.Name;
         }
     }
 
@@ -310,15 +307,9 @@ class ListingRowLocationComparer : IComparer<ListingRow>
 /// <summary>
 /// Represents a continuous range of unanalyzed bytes.
 /// </summary>
-class BlankListingRow : ListingRow
+class BlankListingRow(Assembly assembly, Address location, byte[] data) : ListingRow(assembly, location)
 {
-    private byte[] data;
-
-    public BlankListingRow(Assembly assembly, Address location, byte[] data)
-        : base(assembly, location)
-    {
-        this.data = data;
-    }
+    private readonly byte[] data = data;
 
     public override byte[] Opcode => data;
 
@@ -336,9 +327,9 @@ class BlankListingRow : ListingRow
 
 class CodeListingRow(Assembly assembly, Address location, Instruction instruction, byte[] code) : ListingRow(assembly, location)
 {
-    private Instruction instruction = instruction;
-    private byte[] code = code;
-    private string strInstruction =
+    private readonly Instruction instruction = instruction;
+    private readonly byte[] code = code;
+    private readonly string strInstruction =
             new SymbolicInstructionFormatter().FormatInstruction(instruction);
 
     public Instruction Instruction => this.instruction;
@@ -375,36 +366,24 @@ class CodeListingRow(Assembly assembly, Address location, Instruction instructio
     }
 }
 
-class DataListingRow : ListingRow
+class DataListingRow(Assembly assembly, Address location, byte[] data) : ListingRow(assembly, location)
 {
-    private byte[] data;
-
-    public DataListingRow(Assembly assembly, Address location, byte[] data)
-        : base(assembly, location)
-    {
-        this.data = data;
-    }
+    private readonly byte[] data = data;
 
     public override byte[] Opcode => data;
 
     public override string Text => data.Length switch
     {
-        1 => string.Format("db {0:x2}", data[0]),
-        2 => string.Format("dw {0:x4}", BitConverter.ToUInt16(data, 0)),
-        4 => string.Format("dd {0:x8}", BitConverter.ToUInt32(data, 0)),
+        1 => $"db {data[0]:x2}",
+        2 => $"dw {BitConverter.ToUInt16(data, 0):x4}",
+        4 => $"dd {BitConverter.ToUInt32(data, 0):x8}",
         _ => "** data **",
     };
 }
 
-class ErrorListingRow : ListingRow
+class ErrorListingRow(Assembly assembly, Error error) : ListingRow(assembly, error.Location)
 {
-    private Error error;
-
-    public ErrorListingRow(Assembly assembly, Error error)
-        : base(assembly, error.Location)
-    {
-        this.error = error;
-    }
+    private readonly Error error = error;
 
     public override Color ForeColor => Colors.Red;
 
@@ -422,15 +401,9 @@ class ErrorListingRow : ListingRow
 #endif
 }
 
-class LabelListingRow : ListingRow
+class LabelListingRow(Assembly assembly, BasicBlock block) : ListingRow(assembly, Address.Invalid)
 {
-    private BasicBlock block;
-
-    public LabelListingRow(Assembly assembly, BasicBlock block)
-        : base(assembly, Address.Invalid)
-    {
-        this.block = block;
-    }
+    private readonly BasicBlock block = block;
 
     public override byte[] Opcode => null;
 

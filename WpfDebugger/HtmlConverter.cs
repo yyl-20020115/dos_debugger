@@ -147,7 +147,7 @@ public static class HtmlConverter
                     // Check global attributes.
                     if (tag.Attributes != null)
                     {
-                        foreach (HtmlAttribute attr in tag.Attributes)
+                        foreach (var attr in tag.Attributes)
                         {
                             if (attr.Name == "title")
                             {
