@@ -39,7 +39,7 @@
                 <MenuItem Name="mnuFileSaveLayout" Header="Save Layout" Click="mnuFileSaveLayout_Click"/>
                 <MenuItem Name="mnuFileLoadLayout" Header="Load Layout" Click="mnuFileLoadLayout_Click"/>
                 <Separator/>
-                <MenuItem Header="E_xit" Name="mnuFileExit" Click="mnuFileExit_Click" />
+                <MenuItem Header="E_xit" Name="mnuFileExit" Click="MnuFileExit_Click" />
             </MenuItem>
             <MenuItem Header="_Edit">
                 <MenuItem Header="Copy Address"/>
@@ -73,8 +73,8 @@
                 </MenuItem>
                 <MenuItem Header="Hex View" Name="mnuViewHex"/>
                 <Separator/>
-                <MenuItem Header="Segment List" Name="mnuViewSegments" Click="mnuViewSegments_Click"/>
-                <MenuItem Header="Procedure List" Name="mnuViewProcedures" Click="mnuViewProcedures_Click">
+                <MenuItem Header="Segment List" Name="mnuViewSegments" Click="MnuViewSegments_Click"/>
+                <MenuItem Header="Procedure List" Name="mnuViewProcedures" Click="MnuViewProcedures_Click">
                     <!--<MenuItem.Icon>
                         <util:AutoGrayImage Source="{StaticResource ResourceKey=ProcedureListImage}"/>
                     </MenuItem.Icon>-->
@@ -84,12 +84,12 @@
                         <util:AutoGrayImage Source="{StaticResource ResourceKey=ErrorListImage}"/>
                     </MenuItem.Icon>-->
                 </MenuItem>
-                <MenuItem Header="Properties" Name="mnuViewProperties" Click="mnuViewProperties_Click">
+                <MenuItem Header="Properties" Name="mnuViewProperties" Click="MnuViewProperties_Click">
                     <!--<MenuItem.Icon>
                         <util:AutoGrayImage Source="{StaticResource ResourceKey=PropertyImage}"/>
                     </MenuItem.Icon>-->
                 </MenuItem>
-                <MenuItem Header="Library Browser" Name="mnuViewLibraryBrowser" Click="mnuViewLibraryBrowser_Click"/>
+                <MenuItem Header="Library Browser" Name="mnuViewLibraryBrowser" Click="MnuViewLibraryBrowser_Click"/>
                 <Separator/>
                 <MenuItem Header="Theme">
                     <MenuItem IsChecked="True" Header="Default" Name="mnuViewThemeDefault" Click="mnuViewThemeItem_Click"/>
@@ -103,11 +103,11 @@
             <MenuItem Header="_Tools">
                 <MenuItem Header="Export Procedure Checksums..." 
                           Name="mnuToolsExportChecksum" 
-                          Click="mnuToolsExportChecksum_Click"/>
+                          Click="MnuToolsExportChecksum_Click"/>
             </MenuItem>
             <MenuItem Header="_Help">
-                <MenuItem Name="mnuHelpTest" Header="_Test" Click="mnuHelpTest_Click"/>
-                <MenuItem Header="_About" Name="mnuHelpAbout" Click="mnuHelpAbout_Click"/>
+                <MenuItem Name="mnuHelpTest" Header="_Test" Click="MnuHelpTest_Click"/>
+                <MenuItem Header="_About" Name="mnuHelpAbout" Click="MnuHelpAbout_Click"/>
             </MenuItem>
         </Menu>
         
@@ -173,7 +173,7 @@
                             </avalonDock:LayoutAnchorable>
                             <avalonDock:LayoutAnchorable ContentId="libraryBrowser" Title="Library">
                                 <my:LibraryBrowserControl x:Name="libraryBrowser"
-                                                          RequestProperty="libraryBrowser_RequestProperty"
+                                                          RequestProperty="LibraryBrowser_RequestProperty"
                                                           RequestNavigate="OnRequestNavigate"/>
                             </avalonDock:LayoutAnchorable>
                         </avalonDock:LayoutAnchorGroup>

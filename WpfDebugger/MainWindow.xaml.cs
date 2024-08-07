@@ -65,10 +65,8 @@ public partial class MainWindow : Window
         var serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(
             dockingManager);
         //serializer.LayoutSerializationCallback += serializer_LayoutSerializationCallback;
-        using (var stream = System.IO.File.OpenRead("AvalonLayoutConfig.xml"))
-        {
-            serializer.Deserialize(stream);
-        }
+        using var stream = System.IO.File.OpenRead("AvalonLayoutConfig.xml");
+        serializer.Deserialize(stream);
     }
 
     private void mnuFileSaveLayout_Click(object sender, RoutedEventArgs e)
@@ -180,20 +178,20 @@ public partial class MainWindow : Window
         this.libraryBrowser.Library = library;
     }
 
-    private void mnuHelpTest_Click(object sender, RoutedEventArgs e)
+    private void MnuHelpTest_Click(object sender, RoutedEventArgs e)
     {
-        string fileName = @"..\..\..\..\Test\SLIBC7.LIB";
-        DoOpenLibFile(fileName);
+        //string fileName = @"..\..\..\..\Test\SLIBC7.LIB";
+        //DoOpenLibFile(fileName);
     }
 
-    private void mnuFileExit_Click(object sender, RoutedEventArgs e)
+    private void MnuFileExit_Click(object sender, RoutedEventArgs e)
     {
         this.Close();
     }
 
     #region Tool Window Activation
 
-    private void mnuViewSegments_Click(object sender, RoutedEventArgs e)
+    private void MnuViewSegments_Click(object sender, RoutedEventArgs e)
     {
         ActivateToolWindow(segmentList);
     }
@@ -203,17 +201,17 @@ public partial class MainWindow : Window
         ActivateToolWindow(errorList);
     }
 
-    private void mnuViewProcedures_Click(object sender, RoutedEventArgs e)
+    private void MnuViewProcedures_Click(object sender, RoutedEventArgs e)
     {
         ActivateToolWindow(procedureList);
     }
 
-    private void mnuViewProperties_Click(object sender, RoutedEventArgs e)
+    private void MnuViewProperties_Click(object sender, RoutedEventArgs e)
     {
         ActivateToolWindow(propertiesWindow);
     }
 
-    private void mnuViewLibraryBrowser_Click(object sender, RoutedEventArgs e)
+    private void MnuViewLibraryBrowser_Click(object sender, RoutedEventArgs e)
     {
         ActivateToolWindow(libraryBrowser);
     }
@@ -238,7 +236,7 @@ public partial class MainWindow : Window
 
         var contentId = control.Name;
 
-        LayoutAnchorable pane = dockingManager.Layout.Descendents().OfType<
+        var pane = dockingManager.Layout.Descendents().OfType<
             LayoutAnchorable>().SingleOrDefault(a => a.ContentId == contentId);
 
         if (pane == null)
@@ -259,12 +257,14 @@ public partial class MainWindow : Window
                 anchorGroup = anchorSide.Children[0];
             }
 
-            pane = new LayoutAnchorable();
-            pane.ContentId = contentId;
-            pane.Content = control;
-            if (control.ToolTip is string)
+            pane = new LayoutAnchorable
             {
-                pane.Title = (string)control.ToolTip;
+                ContentId = contentId,
+                Content = control
+            };
+            if (control.ToolTip is string s)
+            {
+                pane.Title = s;
             }
             anchorGroup.Children.Add(pane);
         }
@@ -368,18 +368,18 @@ public partial class MainWindow : Window
         }
     }
 
-    private void mnuHelpAbout_Click(object sender, RoutedEventArgs e)
+    private void MnuHelpAbout_Click(object sender, RoutedEventArgs e)
     {
         MessageBox.Show(this, "DOS Disassembler\r\nCopyright fanci 2012-2013\r\n",
                         "About", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
-    public void libraryBrowser_RequestProperty(object sender, RequestPropertyEventArgs e)
+    public void LibraryBrowser_RequestProperty(object sender, RequestPropertyEventArgs e)
     {
         propertiesWindow.SelectedObject = e.SelectedObject;
     }
 
-    private void mnuToolsExportChecksum_Click(object sender, RoutedEventArgs e)
+    private void MnuToolsExportChecksum_Click(object sender, RoutedEventArgs e)
     {
         if (program == null)
             return;

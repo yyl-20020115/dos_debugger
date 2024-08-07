@@ -83,8 +83,7 @@ public partial class DisassemblyControl : UserControl
     {
         if (e.OriginalSource is Hyperlink hyperlink)
         {
-            MessageBox.Show(string.Format(
-                "Hyperlink clicked: Uri={0}", hyperlink.NavigateUri));
+            MessageBox.Show($"Hyperlink clicked: Uri={hyperlink.NavigateUri}");
         }
     }
 }
