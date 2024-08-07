@@ -36,8 +36,8 @@
                     </MenuItem.Icon>-->
                 </MenuItem>
                 <Separator/>
-                <MenuItem Name="mnuFileSaveLayout" Header="Save Layout" Click="mnuFileSaveLayout_Click"/>
-                <MenuItem Name="mnuFileLoadLayout" Header="Load Layout" Click="mnuFileLoadLayout_Click"/>
+                <MenuItem Name="mnuFileSaveLayout" Header="Save Layout" Click="MnuFileSaveLayout_Click"/>
+                <MenuItem Name="mnuFileLoadLayout" Header="Load Layout" Click="MnuFileLoadLayout_Click"/>
                 <Separator/>
                 <MenuItem Header="E_xit" Name="mnuFileExit" Click="MnuFileExit_Click" />
             </MenuItem>
@@ -79,7 +79,7 @@
                         <util:AutoGrayImage Source="{StaticResource ResourceKey=ProcedureListImage}"/>
                     </MenuItem.Icon>-->
                 </MenuItem>
-                <MenuItem Header="Error List" Name="mnuViewErrors" Click="mnuViewErrors_Click">
+                <MenuItem Header="Error List" Name="mnuViewErrors" Click="MnuViewErrors_Click">
                     <!--<MenuItem.Icon>
                         <util:AutoGrayImage Source="{StaticResource ResourceKey=ErrorListImage}"/>
                     </MenuItem.Icon>-->

@@ -54,10 +54,8 @@ public partial class MainWindow : Window
     {
         var serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(
             dockingManager);
-        using (var stream = System.IO.File.Create("AvalonLayoutConfig.xml"))
-        {
-            serializer.Serialize(stream);
-        }
+        using var stream = System.IO.File.Create("AvalonLayoutConfig.xml");
+        serializer.Serialize(stream);
     }
 
     private void LoadDockingLayout()
@@ -65,17 +63,17 @@ public partial class MainWindow : Window
         var serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(
             dockingManager);
         //serializer.LayoutSerializationCallback += serializer_LayoutSerializationCallback;
-        using var stream = System.IO.File.OpenRead("AvalonLayoutConfig.xml");
+        using var stream = File.OpenRead("AvalonLayoutConfig.xml");
         serializer.Deserialize(stream);
     }
 
-    private void mnuFileSaveLayout_Click(object sender, RoutedEventArgs e)
+    private void MnuFileSaveLayout_Click(object sender, RoutedEventArgs e)
     {
         SaveDockingLayout();
         MessageBox.Show("Layout saved.");
     }
 
-    private void mnuFileLoadLayout_Click(object sender, RoutedEventArgs e)
+    private void MnuFileLoadLayout_Click(object sender, RoutedEventArgs e)
     {
         LoadDockingLayout();
     }
@@ -196,7 +194,7 @@ public partial class MainWindow : Window
         ActivateToolWindow(segmentList);
     }
 
-    private void mnuViewErrors_Click(object sender, RoutedEventArgs e)
+    private void MnuViewErrors_Click(object sender, RoutedEventArgs e)
     {
         ActivateToolWindow(errorList);
     }
@@ -328,7 +326,7 @@ public partial class MainWindow : Window
         //Pointer address = Pointer.Parse(e.Uri.Fragment.Substring(1)); // skip #
         //disassemblyList.GoToAddress(address);
 
-        AssemblyUri uri = e.Uri as AssemblyUri;
+        var uri = e.Uri as AssemblyUri;
         if (uri == null)
             return;
 
